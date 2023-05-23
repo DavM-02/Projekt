@@ -37,25 +37,88 @@ class PlayerObject : public GameObject
 private:
     float velocity_x = 0.2;
     float velocity_y = 0.5;
+    std::vector<float>bottom_bounds;
+    std::vector<float>upper_bounds;
+    std::vector<sf::Vector2f>left_and_upper_bounds;
+    std::vector<float>left_bounds;
+    std::vector<float>right_bounds;
+    std::vector<sf::Vector2f>right_and_bottom_bounds;
+    bool space_pressed = 0;
+    int sign = 1;
 public:
     PlayerObject(sf::Vector2f _size, sf::Vector2f _position, float r_b, float b_b) : GameObject(_size, _position, r_b, b_b) {}
+
+    void set_vectors(std::vector<sf::Vector2f> tmp)
+    {
+        for(int i=0;i<tmp.size();i++)
+        {
+            //upper_bounds.emplace_back(tmp[i].y);
+            //left_bounds.emplace_back(tmp[i].x);
+            left_and_upper_bounds.emplace_back(sf::Vector2f(tmp[i].x,tmp[i].y));
+
+            //right_bounds.emplace_back(tmp[i].x+60);
+            //bottom_bounds.emplace_back(tmp[i].y+60);
+
+            right_and_bottom_bounds.emplace_back(tmp[i].x+130,tmp[i].y+18);
+        }
+    }
+
     void animate(const sf::Time& elapsed, sf::Event& event)
     {
+        int multp = 1;
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        {
+            space_pressed = 1;
+        }
+
+        for(int i=0;i<left_and_upper_bounds.size();i++)
+        {
+            if((int(getPosition().y) == right_and_bottom_bounds[i].y) && ((int(getPosition().x+60) >= left_and_upper_bounds[i].x) && (int(getPosition().x) <= right_and_bottom_bounds[i].x)))
+            {
+                sign = -sign;
+            }
+            if((int(getPosition().x+60) == left_and_upper_bounds[i].x) && ((int(getPosition().y) < right_and_bottom_bounds[i].y) && (int(getPosition().y+60) > left_and_upper_bounds[i].y)))
+            {
+                multp = 0;
+            }
+            if((int(getPosition().x) == right_and_bottom_bounds[i].x) && ((int(getPosition().y) < right_and_bottom_bounds[i].y) && (int(getPosition().y+60) > left_and_upper_bounds[i].y)))
+            {
+                multp = 0;
+            }
+        }
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
-            setPosition(position.x -= velocity_x, position.y);
+            setPosition(position.x -= multp*velocity_x, position.y);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
-            setPosition(position.x += velocity_x, position.y);
+            setPosition(position.x += multp*velocity_x, position.y);
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        if (space_pressed)
         {
-            setPosition(position.x, position.y -= velocity_y);
-        }
-        else
-        {
+            static float zm = 0;
+            if(sign < 0)
+            {
+                zm--;
+            }
+            else
+            {
+                zm++;
+            }
+            setPosition(position.x, position.y -= sign*(velocity_y-(zm/3000)));
 
+            for(int i=0;i<left_and_upper_bounds.size();i++)
+            {
+                if(position.y > 840 || (((position.y+60) == left_and_upper_bounds[i].y) && (sign*(velocity_y-(zm/3000)) < 0)))
+                {
+                    setPosition(position.x, position.y);
+                    sign = 1;
+                    space_pressed = 0;
+                    zm = 0;
+                }
+            }
         }
     }
 };
@@ -72,14 +135,18 @@ public:
 class Board
 {
 private:
-    std::shared_ptr<GameObject>player;
+    std::shared_ptr<PlayerObject>player;
     sf::RenderWindow window;
     std::vector<std::unique_ptr<sf::RectangleShape>>platforms;
 public:
-    Board(std::shared_ptr<GameObject>_obj, sf::Vector2i size) : player(_obj),window(sf::VideoMode(size.x, size.y),"Gra")
+    Board(sf::Vector2i size_) : window(sf::VideoMode(size_.x, size_.y),"Gra")
     {
-
+        sf::Vector2f size(60.0, 60.0);
+        sf::Vector2f position(420.0, 840.0);
+        player = std::make_shared<PlayerObject>(size, position, 600, 600);
         create_platforms();
+        player->set_vectors(get_bounds());
+
         while (window.isOpen())
         {
             sf::Event event;
@@ -141,18 +208,26 @@ public:
                 {
                     position_x = tmp;
                 }
-
             }
             else
             {
                 position_x = tmp;
-            }
+            }                                                                // dotad
             platform->setPosition(position_x,position_y);
             platform->setFillColor(sf::Color::Magenta);
             position_y = position_y-220;
             platforms.emplace_back(std::move(platform));
             acc++;
         }
+    }
+    std::vector<sf::Vector2f> get_bounds()
+    {
+        std::vector<sf::Vector2f> tmp;
+        for(int i=0;i<platforms.size();i++)
+        {
+            tmp.emplace_back(platforms[i]->getPosition());
+        }
+        return tmp;
     }
 };
 
@@ -162,9 +237,10 @@ int main()
     sf::Vector2i window_size(900, 900);
     sf::Vector2f size(60.0, 60.0);
     sf::Vector2f position(420.0, 840.0);
-    std::shared_ptr<GameObject>player = std::make_shared<PlayerObject>(size, position, 600, 600);
-    Board board1(player,window_size);
-
+    //std::shared_ptr<PlayerObject>player = std::make_shared<PlayerObject>(size, position, 600, 600);
+    //Board board1(*player, window_size);
+    Board board1(window_size);
+    //player->set_vectors(board1.get_bounds());
 
     return 0;
 }
