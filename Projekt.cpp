@@ -44,21 +44,17 @@ private:
     std::vector<float>right_bounds;
     std::vector<sf::Vector2f>right_and_bottom_bounds;
     bool space_pressed = 0;
+    bool out_of_platform = 0;
     int sign = 1;
+    bool stopped_in_platform = 0;
 public:
     PlayerObject(sf::Vector2f _size, sf::Vector2f _position, float r_b, float b_b) : GameObject(_size, _position, r_b, b_b) {}
 
-    void set_vectors(std::vector<sf::Vector2f> tmp)
+    void set_vectors(std::vector<sf::Vector2f> tmp) // zapis polozen platform do wektorow
     {
         for(int i=0;i<tmp.size();i++)
         {
-            //upper_bounds.emplace_back(tmp[i].y);
-            //left_bounds.emplace_back(tmp[i].x);
             left_and_upper_bounds.emplace_back(sf::Vector2f(tmp[i].x,tmp[i].y));
-
-            //right_bounds.emplace_back(tmp[i].x+60);
-            //bottom_bounds.emplace_back(tmp[i].y+60);
-
             right_and_bottom_bounds.emplace_back(tmp[i].x+130,tmp[i].y+18);
         }
     }
@@ -69,22 +65,22 @@ public:
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
         {
-            space_pressed = 1;
+            space_pressed = 1; //zmiana na 1 gdy spacja zostanie wcisnieta - potrzebne do petli implementujacej skok
         }
 
         for(int i=0;i<left_and_upper_bounds.size();i++)
         {
             if((int(getPosition().y) == right_and_bottom_bounds[i].y) && ((int(getPosition().x+60) >= left_and_upper_bounds[i].x) && (int(getPosition().x) <= right_and_bottom_bounds[i].x)))
             {
-                sign = -sign;
+                sign = -sign; //dotkniecie platformy od spodu
             }
             if((int(getPosition().x+60) == left_and_upper_bounds[i].x) && ((int(getPosition().y) < right_and_bottom_bounds[i].y) && (int(getPosition().y+60) > left_and_upper_bounds[i].y)))
             {
-                multp = 0;
+                multp = 0; //dotkniecie platformy od lewej
             }
             if((int(getPosition().x) == right_and_bottom_bounds[i].x) && ((int(getPosition().y) < right_and_bottom_bounds[i].y) && (int(getPosition().y+60) > left_and_upper_bounds[i].y)))
             {
-                multp = 0;
+                multp = 0; //dotkniecie platformy od prawej
             }
         }
 
@@ -98,7 +94,7 @@ public:
         }
         if (space_pressed)
         {
-            static float zm = 0;
+            static float zm = 0; //zmienna wykorzystywana przy okreslaniu predkosci
             if(sign < 0)
             {
                 zm--;
@@ -108,15 +104,23 @@ public:
                 zm++;
             }
             setPosition(position.x, position.y -= sign*(velocity_y-(zm/3000)));
-
+            std::cerr << (velocity_y-(zm/3000)) <<std::endl;
+            if(position.y > 840) //stop gdy kwadrat dotknie podloza
+            {
+                setPosition(position.x, position.y);
+                sign = 1;
+                space_pressed = 0;
+                zm = 0;
+            }
             for(int i=0;i<left_and_upper_bounds.size();i++)
             {
-                if(position.y > 840 || (((position.y+60) == left_and_upper_bounds[i].y) && (sign*(velocity_y-(zm/3000)) < 0)))
+                if((int(position.y+60) == left_and_upper_bounds[i].y) && (sign*(velocity_y-(zm/3000)) < 0) && ((int(getPosition().x+60) >= left_and_upper_bounds[i].x) && (int(getPosition().x) <= right_and_bottom_bounds[i].x)))
                 {
                     setPosition(position.x, position.y);
                     sign = 1;
                     space_pressed = 0;
                     zm = 0;
+                    stopped_in_platform = 1;
                 }
             }
         }
