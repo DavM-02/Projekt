@@ -70,7 +70,7 @@ public:
 
         for(int i=0;i<left_and_upper_bounds.size();i++)
         {
-            if((int(getPosition().y) == right_and_bottom_bounds[i].y) && ((int(getPosition().x+60) >= left_and_upper_bounds[i].x) && (int(getPosition().x) <= right_and_bottom_bounds[i].x)))
+            if((int(getPosition().y) == right_and_bottom_bounds[i].y) && ((int(getPosition().x+60) > left_and_upper_bounds[i].x) && (int(getPosition().x) < right_and_bottom_bounds[i].x)))
             {
                 sign = -sign; //dotkniecie platformy od spodu
             }
@@ -81,6 +81,36 @@ public:
             if((int(getPosition().x) == right_and_bottom_bounds[i].x) && ((int(getPosition().y) < right_and_bottom_bounds[i].y) && (int(getPosition().y+60) > left_and_upper_bounds[i].y)))
             {
                 multp = 0; //dotkniecie platformy od prawej
+            }
+            if((int(getPosition().x)+60 < left_and_upper_bounds[i].x) && (int(getPosition().y+60) == left_and_upper_bounds[i].y) && stopped_in_platform)
+            {
+                out_of_platform = 1; //gdy klocek poza platforma
+            }
+            if((int(getPosition().x) > right_and_bottom_bounds[i].x) && (int(getPosition().y+60) == left_and_upper_bounds[i].y) && stopped_in_platform)
+            {
+                out_of_platform = 1;
+            }
+        }
+
+        if(out_of_platform)
+        {
+            static float zm2 = 0; //zmienna wykorzystywana przy okreslaniu predkosci
+            zm2++;
+            setPosition(position.x, position.y += (zm2/3000));
+            for(int i=0;i<left_and_upper_bounds.size();i++)
+            {
+                if((int(position.y+60) == left_and_upper_bounds[i].y) && ((int(getPosition().x+60) >= left_and_upper_bounds[i].x) && (int(getPosition().x) <= right_and_bottom_bounds[i].x)))
+                {
+                    setPosition(position.x, position.y);
+                    out_of_platform = 0;
+                    zm2 = 0;
+                }
+                if(position.y > 840) //stop gdy kwadrat dotknie podloza
+                {
+                    setPosition(position.x, position.y);
+                    out_of_platform = 0;
+                    zm2 = 0;
+                }
             }
         }
 
@@ -104,7 +134,6 @@ public:
                 zm++;
             }
             setPosition(position.x, position.y -= sign*(velocity_y-(zm/3000)));
-            std::cerr << (velocity_y-(zm/3000)) <<std::endl;
             if(position.y > 840) //stop gdy kwadrat dotknie podloza
             {
                 setPosition(position.x, position.y);
