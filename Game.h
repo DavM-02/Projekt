@@ -17,8 +17,10 @@ private:
 public:
 	Game(sf::RenderWindow&);
 	~Game() {}
+	sf::RenderWindow& getWindow();
 	void gameLoop();
-	void collision(const std::vector<PlatformObject*>&, PlayerObject*);
+	void collision();
+	void window_collision();
 	std::vector<PlatformObject*> create_platforms();
 };
 

@@ -1,14 +1,11 @@
 #include "GameObject.h"
-GameObject::GameObject(const sf::Vector2f& _size, const sf::Vector2f& _position, const float& r_b, const float& b_b) :RectangleShape(_size)
+GameObject::GameObject(const sf::Vector2f& _size, const sf::Vector2f& _position) :RectangleShape(_size)
 {
 	setPosition(_position);
-	right_bound = r_b;
-	bottom_bound = b_b;
 }
-GameObject::GameObject(const sf::Vector2f& _size, const float& r_b, const float& b_b) :RectangleShape(_size)
+GameObject::GameObject(const sf::Vector2f& _size) :RectangleShape(_size) 
 {
-	right_bound = r_b;
-	bottom_bound = b_b;
+
 }
 void GameObject::set_velocity(sf::Vector2f _velocity)
 {

@@ -6,8 +6,12 @@
 Game::Game(sf::RenderWindow& _win) : window(_win)
 {
 	window.setFramerateLimit(120);
-	player = new PlayerObject({ 60.0,60.0 }, { 400.0,400.0 }, window.getSize().x, window.getSize().y);
+	player = new PlayerObject({ 60.0,60.0 }, { 400.0,400.0 });
 	platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
+}
+sf::RenderWindow& Game::getWindow()
+{
+	return window;
 }
 void Game::gameLoop()
 {
@@ -34,10 +38,8 @@ void Game::gameLoop()
 		float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
 		//Ruch gracza i sprawdzanie kolizji z oknem i platformami
 		player->animate(elapsed);
-		player->window_collision();
-		collision(platforms, player);
-
-
+		window_collision();
+		collision();
 		window.clear(sf::Color::Black);
 		for (int i = 0; i < platforms.size(); i++)
 		{
@@ -46,10 +48,9 @@ void Game::gameLoop()
 		window.draw(*player);
 		window.display();
 	}
-
 	delete player;
 }
-void Game::collision(const std::vector<PlatformObject*>& platforms, PlayerObject* player)
+void Game::collision()
 {
 	for (int i = 0; i < platforms.size(); i++)
 	{
@@ -95,6 +96,30 @@ void Game::collision(const std::vector<PlatformObject*>& platforms, PlayerObject
 		}
 	}
 }
+
+void Game::window_collision()
+{
+	if (player->getPosition().x <= 0) //Kolizja z lewa sciana okna
+	{
+		player->setPosition(0, player->getPosition().y);
+	}
+	if (player->getPosition().y <= 0) //Kolizja z górna sciana okna
+	{
+		player->setPosition(player->getPosition().x, 0);
+		player->set_velocityY(0);
+	}
+	if (player->getPosition().x + player->getGlobalBounds().width >= window.getSize().x) //Kolizja z prawa sciana okna
+	{
+		player->setPosition(window.getSize().x - player->getGlobalBounds().width, player->getPosition().y);
+	}
+	if (player->getPosition().y + player->getGlobalBounds().height >= window.getSize().y) //Kolizja z dolna sciana okna
+	{
+		player->setPosition(player->getPosition().x, window.getSize().y - player->getGlobalBounds().height);
+		player->setOnGround(true);
+	}
+}
+
+
 std::vector<PlatformObject*> Game::create_platforms()
 {
 	float position_x = 0;
@@ -104,7 +129,7 @@ std::vector<PlatformObject*> Game::create_platforms()
 	std::vector<PlatformObject*> platforms;
 	while (position_y >= 80)
 	{
-		PlatformObject* platform = new PlatformObject({ 130.0,18.0 }, 900, 900); //Zamiast platformy jako RectangleShape robimy platformy jako PlatformObject
+		PlatformObject* platform = new PlatformObject({ 130.0,18.0 }); //Zamiast platformy jako RectangleShape robimy platformy jako PlatformObject
 		float tmp = rand() % 780;
 		if (acc >= 1) //aby w miare rozsadnych odleglosciach sie te platformy respily xD
 		{

@@ -3,7 +3,7 @@
 class PlatformObject : public GameObject
 {
 public:
-	PlatformObject(sf::Vector2f _size, float r_b, float b_b) :GameObject(_size, r_b, b_b) {}
+	PlatformObject(sf::Vector2f _size) :GameObject(_size) {}
 	void animate(const float& elapsed) {}
 };
 
