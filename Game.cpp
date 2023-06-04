@@ -30,9 +30,9 @@ void Game::gameLoop()
 		}
 		//Sprawdza czy przyciski lewo/prawo sa wcisniete (jest róznica miêdzy tymi ifami a ifem ze spacji)
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			player->set_velocityX(300);
+            player->set_velocityX(300);
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			player->set_velocityX(-300);
+            player->set_velocityX(-300);
 		else
 			player->set_velocityX(0);
 		float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
@@ -65,34 +65,49 @@ void Game::collision()
 			float platform_left = platforms[i]->getGlobalBounds().left; //Lewa wspólrzêdna platformy
 			float platform_right = platforms[i]->getGlobalBounds().left + platforms[i]->getGlobalBounds().width; //Prawa wspólrzedna platformy;
 
-			if (player_bot > platform_top && player_top < platform_top) //Kolizja od góry
-			{
-				player->setPosition(player->getPosition().x, platforms[i]->getGlobalBounds().top - player->getGlobalBounds().height);
-				player->setOnGround(true);
-				player->set_velocityY(0);
-				std::cout << "gora" << std::endl;
-			}
-			else if (player_top < platform_bot) //Kolizja od dolu
-			{
-				std::cout << "dol" << std::endl;
-				player->setPosition(player->getPosition().x, platform_bot);
-				player->set_velocityY(0);
-			}
-			/*Kolizja horyzontalna do zrobienia
-			else if (player_left < platform_right && player_right>platform_right)
-			{
-				std::cout << "prawo" << std::endl;
-				player->setPosition(platform_right, player->getPosition().y);
-				player->velocity.x = 0;
-			}
-			else if (player_right > platform_left)
-			{
-				std::cout << "lewo" << std::endl;
-				player->setPosition(platform_left, player->getPosition().y);
-				player->velocity.x = 0;
-			}
-			*/
-
+            if (player_bot > platform_top && player_top < platform_top) //Kolizja od góry
+            {
+                if(player_right > platform_left+3 && player_left < platform_right-3)
+                {
+                    player->setPosition(player->getPosition().x, platforms[i]->getGlobalBounds().top - player->getGlobalBounds().height);
+                    player->setOnGround(true);
+                    player->set_velocityY(0);
+                    //std::cout << "gora" << std::endl;
+                }
+                else
+                {
+                    if (player_left < platform_right && player_left > platform_right-3)
+                    {
+                        std::cout << "prawo" << std::endl;
+                        player->setPosition(platform_right, player->getPosition().y);
+                        player->set_velocityX(0);
+                    }
+                    else if (player_right > platform_left && player_right < platform_left+3)
+                    {
+                        std::cout << "lewo" << std::endl;
+                        player->setPosition(platform_left - player->getGlobalBounds().width, player->getPosition().y);
+                        player->set_velocityX(0);
+                    }
+                }
+            }
+            else if (player_top < platform_bot && player_left < platform_right && player_right > platform_left) //Kolizja od dolu
+            {
+                std::cout << "dol" << std::endl;
+                player->setPosition(player->getPosition().x, platform_bot);
+                player->set_velocityY(0);
+            }
+            else if (player_left < platform_right && player_right>platform_right && player_bot < platform_top)
+            {
+                std::cout << "prawo" << std::endl;
+                player->setPosition(platform_right, player->getPosition().y);
+                player->set_velocityX(0);
+            }
+            else if (player_right > platform_left && player_left < platform_right && player_bot < platform_top)
+            {
+                std::cout << "lewo" << std::endl;
+                player->setPosition(platform_left - player->getGlobalBounds().width, player->getPosition().y);
+                player->set_velocityX(0);
+            }
 		}
 	}
 }
