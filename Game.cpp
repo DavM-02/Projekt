@@ -138,11 +138,6 @@ void Game::window_collision()
     {
         player->setPosition(0, player->getPosition().y);
     }
-    if (player->getPosition().y <= 0) //Kolizja z górna sciana okna
-    {
-        player->setPosition(player->getPosition().x, 0);
-        player->set_velocityY(0);
-    }
     if (player->getPosition().x + player->getGlobalBounds().width >= window.getSize().x) //Kolizja z prawa sciana okna
     {
         player->setPosition(window.getSize().x - player->getGlobalBounds().width, player->getPosition().y);
