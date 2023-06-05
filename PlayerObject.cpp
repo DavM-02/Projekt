@@ -19,7 +19,7 @@ void PlayerObject::jump()
 {
 	if (onGround)
 	{
-		velocity.y = -1200; //Predkosc do góry
+		velocity.y = -1500; //Predkosc do góry
 		onGround = false;
 	}
 }
