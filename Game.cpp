@@ -6,12 +6,19 @@
 Game::Game(sf::RenderWindow& _win) : window(_win)
 {
     window.setFramerateLimit(120);
+    sf::View _view(sf::FloatRect(0.f,0.f,900.f,900.f));
+    window.setView(_view);
+    view = _view;
     player = new PlayerObject({ 60.0,60.0 }, { 400.0,400.0 });
     platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
 }
 sf::RenderWindow& Game::getWindow()
 {
     return window;
+}
+sf::Vector2f Game::get_gravity()
+{
+    return gravity;
 }
 void Game::gameLoop()
 {
@@ -37,9 +44,10 @@ void Game::gameLoop()
             player->set_velocityX(0);
         float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
         //Ruch gracza i sprawdzanie kolizji z oknem i platformami
-        player->animate(elapsed);
+        player->animate(elapsed,gravity);
         window_collision();
         collision();
+        move_window(elapsed);
         window.clear(sf::Color::Black);
         for (int i = 0; i < platforms.size(); i++)
         {
@@ -49,6 +57,18 @@ void Game::gameLoop()
         window.display();
     }
     delete player;
+}
+void Game::move_window(const float& elapsed)
+{
+    if (player->get_velocity().y != 0)
+    {
+        view.move((player->get_velocity() = player->get_velocity() + gravity) * elapsed);
+    }
+    else
+    {
+        view.move((player->get_velocity()) * elapsed);
+    }
+    window.setView(view);
 }
 void Game::collision()
 {
@@ -67,7 +87,7 @@ void Game::collision()
 
             if (player_bot > platform_top && player_top < platform_top) //Kolizja od góry
             {
-                if(player_right > platform_left+5 && player_left < platform_right-5)
+                if (player_right > platform_left + 5 && player_left < platform_right - 5)
                 {
                     player->setPosition(player->getPosition().x, platforms[i]->getGlobalBounds().top - player->getGlobalBounds().height);
                     player->setOnGround(true);
@@ -76,13 +96,13 @@ void Game::collision()
                 }
                 else
                 {
-                    if (player_left < platform_right && player_left > platform_right-4)
+                    if (player_left < platform_right && player_left > platform_right - 4)
                     {
                         std::cout << "prawo" << std::endl;
                         player->setPosition(platform_right, player->getPosition().y);
                         player->set_velocityX(0);
                     }
-                    else if (player_right > platform_left && player_right < platform_left+4)
+                    else if (player_right > platform_left && player_right < platform_left + 4)
                     {
                         std::cout << "lewo" << std::endl;
                         player->setPosition(platform_left - player->getGlobalBounds().width, player->getPosition().y);
@@ -134,7 +154,6 @@ void Game::window_collision()
     }
 }
 
-
 std::vector<PlatformObject*> Game::create_platforms()
 {
     float position_x = 0;
@@ -142,6 +161,11 @@ std::vector<PlatformObject*> Game::create_platforms()
     srand((unsigned)time(0));
     int acc = 0;
     std::vector<PlatformObject*> platforms;
+    PlatformObject* base_platform = new PlatformObject({ 800.0,18.0 });
+    base_platform->setPosition(50.f, 800.f);
+    base_platform->setFillColor(sf::Color::Red);
+    platforms.emplace_back(base_platform);
+
     while (position_y >= 80)
     {
         PlatformObject* platform = new PlatformObject({ 130.0,18.0 }); //Zamiast platformy jako RectangleShape robimy platformy jako PlatformObject
@@ -182,7 +206,7 @@ std::vector<PlatformObject*> Game::create_platforms()
         platform->setPosition(position_x, position_y);
         platform->setFillColor(sf::Color::Magenta);
         position_y = position_y - 220;
-        platforms.emplace_back(std::move(platform));
+        platforms.emplace_back(platform);
         acc++;
     }
     return platforms;
