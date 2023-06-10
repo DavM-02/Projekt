@@ -6,6 +6,7 @@
 #include "PlatformObject.h"
 #include "PlayerObject.h"
 #include "GameObject.h"
+#include "Menu.h"
 class Game
 {
 private:
@@ -16,8 +17,10 @@ private:
 	sf::Clock clock;
 	sf::Event event;
 	sf::Vector2f gravity = { 0.0,30.0 };
+    Menu* menu;
+    bool enter_to_game = 0;
 public:
-	Game(sf::RenderWindow&);
+    Game(sf::RenderWindow&, std::string _menu_texture);
 	~Game() {}
 	sf::RenderWindow& getWindow();
 	sf::Vector2f get_gravity();

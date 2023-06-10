@@ -3,7 +3,7 @@
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-Game::Game(sf::RenderWindow& _win) : window(_win)
+Game::Game(sf::RenderWindow& _win, std::string _menu_texture) : window(_win)
 {
     window.setFramerateLimit(120);
     sf::View _view(sf::FloatRect(0.f,0.f,900.f,900.f));
@@ -11,6 +11,7 @@ Game::Game(sf::RenderWindow& _win) : window(_win)
     view = _view;
     player = new PlayerObject({ 60.0,60.0 }, { 400.0,400.0 });
     platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
+    this->menu = new Menu(_menu_texture);
 }
 sf::RenderWindow& Game::getWindow()
 {
@@ -24,6 +25,12 @@ void Game::gameLoop()
 {
     while (window.isOpen())
     {
+        window.draw(*(menu->get_main_texture()));
+        std::vector<sf::RectangleShape> tmpwek = this->menu->get_positoned_textures();
+        for(int i = 0; i < tmpwek.size(); i++)
+        {
+            window.draw(tmpwek[i]);
+        }
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
@@ -34,26 +41,41 @@ void Game::gameLoop()
             {
                 player->jump();
             }
+            if(event.type == sf::Event::MouseButtonPressed)
+            {
+                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= tmpwek[0].getPosition().x && sf::Mouse::getPosition(window).x <= tmpwek[0].getPosition().x+512 && sf::Mouse::getPosition(window).y >= tmpwek[0].getPosition().y && sf::Mouse::getPosition(window).y <= tmpwek[0].getPosition().y+52)
+                    {
+                    enter_to_game = 1;
+                    }
+                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= tmpwek[1].getPosition().x && sf::Mouse::getPosition(window).x <= tmpwek[1].getPosition().x+512 && sf::Mouse::getPosition(window).y >= tmpwek[1].getPosition().y && sf::Mouse::getPosition(window).y <= tmpwek[1].getPosition().y+52)
+                    {
+                        window.close();
+                    }
+            }
         }
-        //Sprawdza czy przyciski lewo/prawo sa wcisniete (jest róznica miêdzy tymi ifami a ifem ze spacji)
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            player->set_velocityX(300);
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            player->set_velocityX(-300);
-        else
-            player->set_velocityX(0);
-        float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
-        //Ruch gracza i sprawdzanie kolizji z oknem i platformami
-        player->animate(elapsed,gravity);
-        window_collision();
-        collision();
-        move_window(elapsed);
-        window.clear(sf::Color::Black);
-        for (int i = 0; i < platforms.size(); i++)
+
+        if(enter_to_game == 1)
         {
-            window.draw(*platforms[i]);
+            //Sprawdza czy przyciski lewo/prawo sa wcisniete (jest róznica miêdzy tymi ifami a ifem ze spacji)
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+                    player->set_velocityX(300);
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+                    player->set_velocityX(-300);
+            else
+                    player->set_velocityX(0);
+            float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
+            //Ruch gracza i sprawdzanie kolizji z oknem i platformami
+            player->animate(elapsed,gravity);
+            window_collision();
+            collision();
+            move_window(elapsed);
+            window.clear(sf::Color::Black);
+            for (int i = 0; i < platforms.size(); i++)
+            {
+                window.draw(*platforms[i]);
+            }
+            window.draw(*player);
         }
-        window.draw(*player);
         window.display();
     }
     delete player;
@@ -152,7 +174,7 @@ void Game::window_collision()
 std::vector<PlatformObject*> Game::create_platforms()
 {
     float position_x = 0;
-    float position_y = 750;
+    float position_y = 600;
     srand((unsigned)time(0));
     int acc = 0;
     std::vector<PlatformObject*> platforms;
@@ -161,7 +183,7 @@ std::vector<PlatformObject*> Game::create_platforms()
     base_platform->setFillColor(sf::Color::Red);
     platforms.emplace_back(base_platform);
 
-    while (position_y >= 80)
+    while (position_y >= -1000)
     {
         PlatformObject* platform = new PlatformObject({ 130.0,18.0 }); //Zamiast platformy jako RectangleShape robimy platformy jako PlatformObject
         float tmp = rand() % 780;
