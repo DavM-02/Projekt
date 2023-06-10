@@ -15,9 +15,11 @@ private:
 	std::vector<PlatformObject*> platforms;
 	PlayerObject* player;
 	sf::Clock clock;
+    sf::Clock* klok;
 	sf::Event event;
 	sf::Vector2f gravity = { 0.0,30.0 };
     Menu* menu;
+    std::vector<sf::RectangleShape>imported_textures;
     bool enter_to_game = 0;
 public:
     Game(sf::RenderWindow&, std::string _menu_texture);
@@ -25,7 +27,7 @@ public:
 	sf::RenderWindow& getWindow();
 	sf::Vector2f get_gravity();
 	void gameLoop();
-	void move_window(const float&);
+    void move_window();
 	void collision();
 	void window_collision();
 	std::vector<PlatformObject*> create_platforms();

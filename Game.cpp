@@ -25,11 +25,12 @@ void Game::gameLoop()
 {
     while (window.isOpen())
     {
+        //clock.restart().asSeconds();
         window.draw(*(menu->get_main_texture()));
-        std::vector<sf::RectangleShape> tmpwek = this->menu->get_positoned_textures();
-        for(int i = 0; i < tmpwek.size(); i++)
+        this->imported_textures = this->menu->get_positoned_textures();
+        for(int i = 0; i < imported_textures.size(); i++)
         {
-            window.draw(tmpwek[i]);
+            window.draw(imported_textures[i]); // rysowanie przyciskow graj i zakoncz
         }
         while (window.pollEvent(event))
         {
@@ -40,14 +41,17 @@ void Game::gameLoop()
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) //Sprawdza czy zostala wscisnieta spacja
             {
                 player->jump();
+                clock.restart().asSeconds();
             }
             if(event.type == sf::Event::MouseButtonPressed)
             {
-                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= tmpwek[0].getPosition().x && sf::Mouse::getPosition(window).x <= tmpwek[0].getPosition().x+512 && sf::Mouse::getPosition(window).y >= tmpwek[0].getPosition().y && sf::Mouse::getPosition(window).y <= tmpwek[0].getPosition().y+52)
+                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[0].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[0].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[0].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[0].getPosition().y+52)
                     {
-                    enter_to_game = 1;
+                    enter_to_game = 1; //gdy user kliknal przycisk "graj"
+                    klok = new sf::Clock();
+                    klok->restart().asSeconds();
                     }
-                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= tmpwek[1].getPosition().x && sf::Mouse::getPosition(window).x <= tmpwek[1].getPosition().x+512 && sf::Mouse::getPosition(window).y >= tmpwek[1].getPosition().y && sf::Mouse::getPosition(window).y <= tmpwek[1].getPosition().y+52)
+                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[1].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[1].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[1].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[1].getPosition().y+52)
                     {
                         window.close();
                     }
@@ -63,12 +67,16 @@ void Game::gameLoop()
                     player->set_velocityX(-300);
             else
                     player->set_velocityX(0);
+
+
+            //float elapsed = klok->restart().asSeconds();
             float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
+            //std::cout << elapsed << std::endl;
             //Ruch gracza i sprawdzanie kolizji z oknem i platformami
             player->animate(elapsed,gravity);
             window_collision();
             collision();
-            move_window(elapsed);
+            move_window();
             window.clear(sf::Color::Black);
             for (int i = 0; i < platforms.size(); i++)
             {
@@ -80,16 +88,13 @@ void Game::gameLoop()
     }
     delete player;
 }
-void Game::move_window(const float& elapsed)
+void Game::move_window()
 {
-    if (player->get_velocity().y != 0)
+    if(view.getCenter().y != player->getPosition().y+30)
     {
-        view.move((player->get_velocity() = player->get_velocity() + gravity) * elapsed);
+        view.move(sf::Vector2f{0,player->getPosition().y+30-view.getCenter().y}); //przesuwanie ekranu w pionie w zaleznosci od polozenia srodka widoku
     }
-    else
-    {
-        view.move((player->get_velocity()) * elapsed);
-    }
+
     window.setView(view);
 }
 void Game::collision()
