@@ -48,8 +48,6 @@ void Game::gameLoop()
                     if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[0].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[0].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[0].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[0].getPosition().y+52)
                     {
                     enter_to_game = 1; //gdy user kliknal przycisk "graj"
-                    klok = new sf::Clock();
-                    klok->restart().asSeconds();
                     }
                     if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[1].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[1].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[1].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[1].getPosition().y+52)
                     {
@@ -69,9 +67,7 @@ void Game::gameLoop()
                     player->set_velocityX(0);
 
 
-            //float elapsed = klok->restart().asSeconds();
             float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
-            //std::cout << elapsed << std::endl;
             //Ruch gracza i sprawdzanie kolizji z oknem i platformami
             player->animate(elapsed,gravity);
             window_collision();

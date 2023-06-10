@@ -15,7 +15,6 @@ private:
 	std::vector<PlatformObject*> platforms;
 	PlayerObject* player;
 	sf::Clock clock;
-    sf::Clock* klok;
 	sf::Event event;
 	sf::Vector2f gravity = { 0.0,30.0 };
     Menu* menu;
