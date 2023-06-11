@@ -3,14 +3,15 @@
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-Game::Game(sf::RenderWindow& _win) : window(_win)
+Game::Game(sf::RenderWindow& _win, std::string _menu_texture) : window(_win)
 {
     window.setFramerateLimit(120);
     sf::View _view(sf::FloatRect(0.f,0.f,900.f,900.f));
     window.setView(_view);
     view = _view;
-    player = new PlayerObject({ 60.0,60.0 }, { 400.0,400.0 });
+    player = new PlayerObject({ 60.0,60.0 }, { 740.0,740.0 });
     platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
+    this->menu = new Menu(_menu_texture);
 }
 sf::RenderWindow& Game::getWindow()
 {
@@ -24,50 +25,73 @@ void Game::gameLoop()
 {
     while (window.isOpen())
     {
+        //std::cout << player->getPosition().y << std::endl;
+        window.draw(*(menu->get_main_texture()));
+        this->imported_textures = this->menu->get_positoned_textures();
+        for(int i = 0; i < imported_textures.size(); i++)
+        {
+            window.draw(imported_textures[i]); // rysowanie przyciskow graj i zakoncz
+        }
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
             {
                 window.close();
             }
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) //Sprawdza czy zostala wscisnieta spacja
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space && enter_to_game) //Sprawdza czy zostala wscisnieta spacja
             {
                 player->jump();
+
+            }
+            if(event.type == sf::Event::MouseButtonPressed)
+            {
+                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[0].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[0].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[0].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[0].getPosition().y+52)
+                    {
+                        enter_to_game = true; //gdy user kliknal przycisk "graj"
+                        clock.restart();
+                    }
+                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[1].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[1].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[1].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[1].getPosition().y+52)
+                    {
+                        window.close();
+                    }
             }
         }
-        //Sprawdza czy przyciski lewo/prawo sa wcisniete (jest róznica miêdzy tymi ifami a ifem ze spacji)
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            player->set_velocityX(300);
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            player->set_velocityX(-300);
-        else
-            player->set_velocityX(0);
-        float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
-        //Ruch gracza i sprawdzanie kolizji z oknem i platformami
-        player->animate(elapsed,gravity);
-        window_collision();
-        collision();
-        move_window(elapsed);
-        window.clear(sf::Color::Black);
-        for (int i = 0; i < platforms.size(); i++)
+
+        if(enter_to_game)
         {
-            window.draw(*platforms[i]);
+            //Sprawdza czy przyciski lewo/prawo sa wcisniete (jest róznica miêdzy tymi ifami a ifem ze spacji)
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+                    player->set_velocityX(400);
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+                    player->set_velocityX(-400);
+            else
+                    player->set_velocityX(0);
+
+
+            float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
+            std::cout << elapsed << std::endl;
+            //Ruch gracza i sprawdzanie kolizji z oknem i platformami
+            player->animate(elapsed,gravity);
+            window_collision();
+            collision();
+            move_window();
+            window.clear(sf::Color::Black);
+            for (int i = 0; i < platforms.size(); i++)
+            {
+                window.draw(*platforms[i]);
+            }
+            window.draw(*player);
         }
-        window.draw(*player);
         window.display();
     }
-    delete player;
 }
-void Game::move_window(const float& elapsed)
+void Game::move_window()
 {
-    if (player->get_velocity().y != 0)
+    if(view.getCenter().y != player->getPosition().y+30)
     {
-        view.move((player->get_velocity() = player->get_velocity() + gravity) * elapsed);
+        view.move(sf::Vector2f{0,player->getPosition().y+30-view.getCenter().y}); //przesuwanie ekranu w pionie w zaleznosci od polozenia srodka widoku
     }
-    else
-    {
-        view.move((player->get_velocity()) * elapsed);
-    }
+
     window.setView(view);
 }
 void Game::collision()
@@ -152,7 +176,7 @@ void Game::window_collision()
 std::vector<PlatformObject*> Game::create_platforms()
 {
     float position_x = 0;
-    float position_y = 750;
+    float position_y = 600;
     srand((unsigned)time(0));
     int acc = 0;
     std::vector<PlatformObject*> platforms;
@@ -161,7 +185,7 @@ std::vector<PlatformObject*> Game::create_platforms()
     base_platform->setFillColor(sf::Color::Red);
     platforms.emplace_back(base_platform);
 
-    while (position_y >= 80)
+    while (position_y >= -1000)
     {
         PlatformObject* platform = new PlatformObject({ 130.0,18.0 }); //Zamiast platformy jako RectangleShape robimy platformy jako PlatformObject
         float tmp = rand() % 780;
