@@ -52,7 +52,3 @@ std::vector<sf::RectangleShape> Menu::get_positoned_textures()
     return positoned_textures;
 }
 
-std::vector<sf::Vector2f> Menu::get_buttons_positions()
-{
-
-}

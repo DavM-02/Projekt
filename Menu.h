@@ -17,5 +17,4 @@ public:
     sf::Sprite* get_main_texture();
     void set_textures();
     std::vector<sf::RectangleShape> get_positoned_textures();
-    std::vector<sf::Vector2f> get_buttons_positions();
 };
