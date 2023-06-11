@@ -13,5 +13,6 @@ int main()
 	std::string menu_texture = "menu_giery.png";
 	Game* game = new Game(window,menu_texture);
 	game->gameLoop();
+	delete game;
 	return 0;
-}
+}	

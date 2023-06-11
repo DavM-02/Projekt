@@ -19,7 +19,7 @@ private:
 	sf::Vector2f gravity = { 0.0,30.0 };
     Menu* menu;
     std::vector<sf::RectangleShape>imported_textures;
-    bool enter_to_game = 0;
+    bool enter_to_game = false;
 public:
     Game(sf::RenderWindow&, std::string _menu_texture);
 	~Game() {}

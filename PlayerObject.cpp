@@ -11,7 +11,7 @@ void PlayerObject::animate(const float& elapsed,sf::Vector2f gravity)
 {
 	float old_pos = getPosition().y;
     const float& cons = 0.0085;
-    move((velocity += gravity) * cons); //Dodaje do pozycji wartosc predkosci+grawitacji
+    move((velocity += gravity) * elapsed); //Dodaje do pozycji wartosc predkosci+grawitacji
 	float new_pos = getPosition().y;
 	if (new_pos != old_pos)
 		onGround = false;
