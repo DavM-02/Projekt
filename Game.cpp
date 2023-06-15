@@ -72,27 +72,6 @@ void Game::gameLoop()
 
         if(enter_to_game)
         {
-            //Sprawdza czy przyciski lewo/prawo sa wcisniete (jest róznica miêdzy tymi ifami a ifem ze spacji)
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                    player->set_velocityX(400);
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                    player->set_velocityX(-400);
-            else
-                    player->set_velocityX(0);
-
-
-            float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
-            //std::cout << elapsed << std::endl;
-            //Ruch gracza i sprawdzanie kolizji z oknem i platformami
-            player->animate(elapsed,gravity);
-            for (int i = 0; i < platforms.size(); i++)
-            {
-                platforms[i]->animate(elapsed, gravity);
-            }
-            window_collision();
-            collision(elapsed);
-            //Ruch okna
-            move_window();
             new_round();
         }
         if(is_new_round)
@@ -295,13 +274,13 @@ void Game::new_round()
     //Ruch gracza i sprawdzanie kolizji z oknem i platformami
     player->animate(elapsed,gravity);
     window_collision();
-    collision();
+    collision(elapsed);
     window.clear(sf::Color::Black);
     for (int i = 0; i < platforms.size(); i++)
     {
         window.draw(*platforms[i]);
+        platforms[i]->animate(elapsed, gravity);
     }
-
     window.draw(*player);
     move_window();
 }
