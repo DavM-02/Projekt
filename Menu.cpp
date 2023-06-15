@@ -52,3 +52,11 @@ std::vector<sf::RectangleShape> Menu::get_positoned_textures()
     return positoned_textures;
 }
 
+void Menu::draw_initial_textures(sf::RenderWindow& _window)
+{
+    _window.draw(*(get_main_texture()));
+    for(int i = 0; i < positoned_textures.size(); i++)
+    {
+        _window.draw(positoned_textures[i]); // rysowanie przyciskow graj i zakoncz
+    }
+}
