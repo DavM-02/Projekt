@@ -9,10 +9,11 @@ void PlayerObject::setOnGround(bool _oG)
 }
 void PlayerObject::animate(const float& elapsed,sf::Vector2f gravity)
 {
-	float old_height = getPosition().y;
+	float old_pos = getPosition().y;
+    const float& cons = 0.0085;
     move((velocity += gravity) * elapsed); //Dodaje do pozycji wartosc predkosci+grawitacji
-	float new_height = getPosition().y;
-	if (new_height != old_height)
+	float new_pos = getPosition().y;
+	if (new_pos != old_pos)
 		onGround = false;
 }
 void PlayerObject::jump()
