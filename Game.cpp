@@ -73,7 +73,6 @@ void Game::gameLoop()
         {
             new_round();
         }
-
         if(is_new_round)
         {
             enter_to_game = false;
@@ -100,7 +99,7 @@ void Game::move_window()
     window.setView(view);
     this->round->draw_round(window, sf::Vector2f(-45.0, view.getCenter().y-440)); //rysowanie numeru rundy
 }
-void Game::collision()
+void Game::collision(const float& elapsed)
 {
     for (int i = 0; i < platforms.size(); i++)
     {
@@ -121,6 +120,8 @@ void Game::collision()
                 {
                     player->setPosition(player->getPosition().x, platforms[i]->getGlobalBounds().top - player->getGlobalBounds().height);
                     player->setOnGround(true);
+                    if (platforms[i]->getMovingState())
+                        player->move({ platforms[i]->get_velocity().x * elapsed,0.0 }); // Jeśli gracz stoi na ruchomej platformie, przesuń go o wartość prędkości platformy
                     player->set_velocityY(0);
                     if(i == platforms.size()-1 && actual_level < 4)
                     {
@@ -168,7 +169,6 @@ void Game::collision()
         }
     }
 }
-
 void Game::window_collision()
 {
     if (player->getPosition().x <= 0) //Kolizja z lewa sciana okna
@@ -184,6 +184,19 @@ void Game::window_collision()
         player->setPosition(player->getPosition().x, window.getSize().y - player->getGlobalBounds().height);
         player->setOnGround(true);
     }
+    for (int i = 1; i < platforms.size(); i++)
+    {
+        if (platforms[i]->getPosition().x + platforms[i]->getGlobalBounds().width >= window.getSize().x) // Kolizja platformy
+        {
+            platforms[i]->set_velocityX(platforms[i]->get_velocity().x * (-1));
+            platforms[i]->setPosition(window.getSize().x - platforms[i]->getGlobalBounds().width, platforms[i]->getPosition().y);
+        }
+        else if (platforms[i]->getPosition().x <= 0)
+        {
+            platforms[i]->set_velocityX(platforms[i]->get_velocity().x * (-1));
+            platforms[i]->setPosition(0, platforms[i]->getPosition().y);
+        }
+    }
 }
 
 std::vector<PlatformObject*> Game::create_platforms()
@@ -193,14 +206,13 @@ std::vector<PlatformObject*> Game::create_platforms()
     srand((unsigned)time(0));
     int acc = 0;
     std::vector<PlatformObject*> platforms;
-    PlatformObject* base_platform = new PlatformObject({ 800.0,18.0 });
-    base_platform->setPosition(50.f, 800.f);
+    PlatformObject* base_platform = new PlatformObject({0.0,800.0}, { 900.0, 18.0 },false);
     base_platform->setFillColor(sf::Color::Red);
     platforms.emplace_back(base_platform);
 
     while (position_y >= -1000)
     {
-        PlatformObject* platform = new PlatformObject({ 130.0,18.0 }); //Zamiast platformy jako RectangleShape robimy platformy jako PlatformObject
+        PlatformObject* platform = new PlatformObject({ 130.0,18.0 },true); //Zamiast platformy jako RectangleShape robimy platformy jako PlatformObject
         float tmp = rand() % 780;
         if (acc >= 1) //aby w miare rozsadnych odleglosciach sie te platformy respily xD
         {
@@ -258,13 +270,13 @@ void Game::new_round()
     //Ruch gracza i sprawdzanie kolizji z oknem i platformami
     player->animate(elapsed,gravity);
     window_collision();
-    collision();
+    collision(elapsed);
     window.clear(sf::Color::Black);
     for (int i = 0; i < platforms.size(); i++)
     {
         window.draw(*platforms[i]);
+        platforms[i]->animate(elapsed, gravity);
     }
-
     window.draw(*player);
     move_window();
 }

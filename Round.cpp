@@ -57,7 +57,6 @@ void Round::draw_buttons(sf::RenderWindow& _window, sf::View& view)
     zakoncz->setTexture(texture4);
     zakoncz->setPosition(sf::Vector2f(190.0, view.getCenter().y+150));
     _window.draw(*zakoncz);
-
     if(first_button_coordinates == sf::Vector2f(0.0,0.0) && second_button_coordinates == sf::Vector2f(0.0,0.0))
     {
         first_button_coordinates = graj_dalej->getPosition();
