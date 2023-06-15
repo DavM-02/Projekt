@@ -1,4 +1,4 @@
-﻿#include "Game.h"
+#include "Game.h"
 #include <iostream>
 
 #include <SFML/Window.hpp>
@@ -28,7 +28,7 @@ void Game::gameLoop()
         //std::cout << player->getPosition().y << std::endl;
         window.draw(*(menu->get_main_texture()));
         this->imported_textures = this->menu->get_positoned_textures();
-        for(int i = 0; i < imported_textures.size(); i++)
+        for (int i = 0; i < imported_textures.size(); i++)
         {
             window.draw(imported_textures[i]); // rysowanie przyciskow graj i zakoncz
         }
@@ -43,35 +43,35 @@ void Game::gameLoop()
                 player->jump();
 
             }
-            if(event.type == sf::Event::MouseButtonPressed)
+            if (event.type == sf::Event::MouseButtonPressed)
             {
-                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[0].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[0].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[0].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[0].getPosition().y+52)
-                    {
-                        enter_to_game = true; //gdy user kliknal przycisk "graj"
-                        clock.restart();
-                    }
-                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[1].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[1].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[1].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[1].getPosition().y+52)
-                    {
-                        window.close();
-                    }
+                if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[0].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[0].getPosition().x + 512 && sf::Mouse::getPosition(window).y >= imported_textures[0].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[0].getPosition().y + 52)
+                {
+                    enter_to_game = true; //gdy user kliknal przycisk "graj"
+                    clock.restart();
+                }
+                if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[1].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[1].getPosition().x + 512 && sf::Mouse::getPosition(window).y >= imported_textures[1].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[1].getPosition().y + 52)
+                {
+                    window.close();
+                }
             }
         }
 
-        if(enter_to_game)
+        if (enter_to_game)
         {
             //Sprawdza czy przyciski lewo/prawo sa wcisniete (jest róznica miêdzy tymi ifami a ifem ze spacji)
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                    player->set_velocityX(400);
+                player->set_velocityX(400);
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                    player->set_velocityX(-400);
+                player->set_velocityX(-400);
             else
-                    player->set_velocityX(0);
+                player->set_velocityX(0);
 
 
             float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
             //std::cout << elapsed << std::endl;
             //Ruch gracza i sprawdzanie kolizji z oknem i platformami
-            player->animate(elapsed,gravity);
+            player->animate(elapsed, gravity);
             for (int i = 0; i < platforms.size(); i++)
             {
                 platforms[i]->animate(elapsed, gravity);
@@ -80,13 +80,26 @@ void Game::gameLoop()
             collision(elapsed);
             //Ruch okna
             move_window();
-            window.clear(sf::Color::Black);
-            for (int i = 0; i < platforms.size(); i++)
-            {
-                window.draw(*platforms[i]);
-            }
-            window.draw(*player);
+            new_round();
         }
+
+        if (is_new_round)
+        {
+            enter_to_game = false;
+            window.clear(sf::Color::Black);
+            round_end();
+        }
+    
+        if (end_of_the_game)
+        {
+                window.clear(sf::Color::Black);
+                end_of_game();
+        }
+        for (int i = 0; i < platforms.size(); i++)
+        {
+                window.draw(*platforms[i]);
+        }
+            window.draw(*player);
         window.display();
     }
 }
@@ -123,6 +136,14 @@ void Game::collision(const float& elapsed)
                     if (platforms[i]->getMovingState())
                         player->move({ platforms[i]->get_velocity().x * elapsed,0.0 }); // Jeśli gracz stoi na ruchomej platformie, przesuń go o wartość prędkości platformy
                     player->set_velocityY(0);
+                    if (i == platforms.size() - 1 && actual_level < 4)
+                    {
+                        is_new_round = true;
+                    }
+                    if (i == platforms.size() - 1 && actual_level == 4)
+                    {
+                        end_of_the_game = true;
+                    }
                 }
                 else
                 {
