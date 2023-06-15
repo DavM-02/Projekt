@@ -3,10 +3,7 @@ GameObject::GameObject(const sf::Vector2f& _size, const sf::Vector2f& _position)
 {
 	setPosition(_position);
 }
-GameObject::GameObject(const sf::Vector2f& _size) :RectangleShape(_size) 
-{
-
-}
+GameObject::GameObject(const sf::Vector2f& _size) :RectangleShape(_size) {}
 void GameObject::set_velocity(sf::Vector2f _velocity)
 {
 	velocity = _velocity;

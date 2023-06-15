@@ -33,7 +33,7 @@ public:
 	sf::Vector2f get_gravity();
 	void gameLoop();
     void move_window();
-	void collision();
+	void collision(const float& elapsed);
 	void window_collision();
     void new_round();
     void round_end();
