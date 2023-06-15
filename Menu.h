@@ -17,4 +17,5 @@ public:
     sf::Sprite* get_main_texture();
     void set_textures();
     std::vector<sf::RectangleShape> get_positoned_textures();
+    void draw_initial_textures(sf::RenderWindow& _window);
 };
