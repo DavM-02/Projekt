@@ -25,12 +25,9 @@ void Game::gameLoop()
 {
     while (window.isOpen())
     {
-        window.draw(*(menu->get_main_texture()));
+        menu->draw_initial_textures(window);
         this->imported_textures = this->menu->get_positoned_textures();
-        for(int i = 0; i < imported_textures.size(); i++)
-        {
-            window.draw(imported_textures[i]); // rysowanie przyciskow graj i zakoncz
-        }
+
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
@@ -49,12 +46,13 @@ void Game::gameLoop()
                         enter_to_game = true; //gdy user kliknal przycisk "graj"
                         clock.restart();
                         platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
+                        this->round = new Round(actual_level);  //tworzenie instancji klasy round
                     }
                     if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[1].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[1].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[1].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[1].getPosition().y+52 && !enter_to_game && !is_new_round)
                     {
                         window.close();
                     }
-                    if(event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709 && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) >= view.getCenter().y && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) <= view.getCenter().y+52 && is_new_round && !enter_to_game && actual_level < 4)
+                    if(event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709.0 && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) >= view.getCenter().y && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) <= view.getCenter().y+52 && is_new_round && !enter_to_game && actual_level < 4)
                     {
                         player->setPosition(sf::Vector2f(740.0,740.0));
                         enter_to_game = true;
@@ -62,8 +60,9 @@ void Game::gameLoop()
                         clock.restart();
                         platforms = create_platforms();
                         actual_level++;
+                        this->round = new Round(actual_level);  //tworzenie instancji klasy round
                     }
-                    if(event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709 && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) >= view.getCenter().y+150 && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) <= view.getCenter().y+202 && is_new_round && !enter_to_game && actual_level < 4)
+                    if(event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709.0 && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) >= view.getCenter().y+150 && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) <= view.getCenter().y+202 && is_new_round && !enter_to_game && actual_level < 4)
                     {
                         window.close();
                     }
@@ -98,10 +97,10 @@ void Game::move_window()
     }
 
     window.setView(view);
-    this->round = new Round(actual_level, this->getWindow(), sf::Vector2f(-45.0, view.getCenter().y-440));  //tworzenie instancji klasy round
+    this->round->draw_round(window, sf::Vector2f(-45.0, view.getCenter().y-440)); //rysowanie numeru rundy
 }
 void Game::collision(const float& elapsed)
-{;
+{
     for (int i = 0; i < platforms.size(); i++)
     {
         if (player->getGlobalBounds().intersects(platforms[i]->getGlobalBounds()))
@@ -124,15 +123,13 @@ void Game::collision(const float& elapsed)
                     if (platforms[i]->getMovingState())
                         player->move({ platforms[i]->get_velocity().x * elapsed,0.0 }); // Jeśli gracz stoi na ruchomej platformie, przesuń go o wartość prędkości platformy
                     player->set_velocityY(0);
-
-                    //std::cout << "gora" << std::endl;
                     if(i == platforms.size()-1 && actual_level < 4)
                     {
-                        is_new_round = true;
+                        is_new_round = true; //kiedy ukonczymy dany poziom
                     }
                     if(i == platforms.size()-1 && actual_level == 4)
                     {
-                        end_of_the_game = true;
+                        end_of_the_game = true; //kiedy ukonczymy ostatni poziom - gra sie konczy
                     }
                 }
                 else
@@ -270,7 +267,6 @@ void Game::new_round()
         player->set_velocityX(0);
 
     float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
-    // std::cout << elapsed << std::endl;
     //Ruch gracza i sprawdzanie kolizji z oknem i platformami
     player->animate(elapsed,gravity);
     window_collision();
@@ -302,7 +298,7 @@ void Game::round_end()
     actual_round->setPosition(sf::Vector2f(80.0, view.getCenter().y-350.0));
     window.draw(*actual_round);
 
-    round->draw_battons(window,view);
+    round->draw_buttons(window,view);
 }
 
 void Game::end_of_game()
