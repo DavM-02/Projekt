@@ -11,7 +11,7 @@ public:
 	int get_PointsNumber();
 	void addPoints(const int& _pts);
 	void setOnGround(bool);
-	void animate(const float& elapsed,sf::Vector2f gravity);
+	void animate(const float& elapsed);
 	void jump();
 };
 

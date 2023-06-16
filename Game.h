@@ -20,7 +20,6 @@ private:
 	sf::Clock round_clock;
 	sf::Event event;
 	sf::Font text_font;
-	sf::Vector2f gravity = { 0.0,30.0 };
     Menu* menu;
     std::vector<sf::RectangleShape>imported_textures;
     Round* round;
@@ -32,7 +31,6 @@ public:
     Game(sf::RenderWindow&, std::string _menu_texture);
 	~Game() {}
 	sf::RenderWindow& getWindow();
-	sf::Vector2f get_gravity();
 	void gameLoop();
     void move_window();
 	void collision(const float& elapsed);

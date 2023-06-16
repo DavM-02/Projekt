@@ -6,8 +6,8 @@
 class GameObject : public sf::RectangleShape
 {
 protected:
-	sf::Vector2f velocity={0,0};
-
+	sf::Vector2f velocity = { 0,0 };
+	sf::Vector2f gravity = { 0.0,30.0 };
 public:
 	GameObject(const sf::Vector2f&, const sf::Vector2f&);
 	GameObject(const sf::Vector2f&);
@@ -16,6 +16,6 @@ public:
 	void set_velocityX(float);
 	void set_velocityY(float);
 	sf::Vector2f get_velocity();
-	virtual void animate(const float& elapsed,sf::Vector2f gravity)=0;
+	virtual void animate(const float& elapsed)=0;
 };
 

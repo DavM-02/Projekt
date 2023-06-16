@@ -12,17 +12,11 @@ Game::Game(sf::RenderWindow& _win, std::string _menu_texture) : window(_win)
     window.setView(_view);
     view = _view;
     player = new PlayerObject({ 60.0,60.0 }, { 740.0,740.0 });
-   // platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
     this->menu = new Menu(_menu_texture);
-
 }
 sf::RenderWindow& Game::getWindow()
 {
     return window;
-}
-sf::Vector2f Game::get_gravity()
-{
-    return gravity;
 }
 void Game::gameLoop()
 {
@@ -136,7 +130,6 @@ void Game::collision(const float& elapsed)
                             end_of_the_game = true; //kiedy ukonczymy ostatni poziom - gra sie konczy
                         if (actual_level < 4)
                             is_new_round = true; //kiedy ukonczymy dany poziom;
-
                         player->addPoints((1 / round_clock.restart().asSeconds()) * 10000);
                     }
                 }
@@ -271,14 +264,14 @@ void Game::new_round()
 
     float elapsed = clock.restart().asSeconds(); //Czas pomiedzy wygenerowanymi klatkami
     //Ruch gracza i sprawdzanie kolizji z oknem i platformami
-    player->animate(elapsed,gravity);
+    player->animate(elapsed);
     window_collision();
     collision(elapsed);
     window.clear(sf::Color::Black);
     for (int i = 0; i < platforms.size(); i++)
     {
         window.draw(*platforms[i]);
-        platforms[i]->animate(elapsed, gravity);
+        platforms[i]->animate(elapsed);
     }
     window.draw(*player);
     move_window();

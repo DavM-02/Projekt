@@ -21,7 +21,7 @@ bool PlatformObject::getMovingState()
 {
 	return isMovingPlatform;
 }
-void PlatformObject::animate(const float& elapsed, sf::Vector2f gravity)
+void PlatformObject::animate(const float& elapsed)
 {
 	move(velocity * elapsed);
 }
