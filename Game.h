@@ -25,6 +25,7 @@ private:
     bool enter_to_game = false;
     bool is_new_round = false;
     bool end_of_the_game = false;
+	bool file_updated=false;
     int actual_level = 0;
 public:
     Game(sf::RenderWindow&,const std::string& _menu_texture);

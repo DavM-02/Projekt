@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <fstream>
+#include <chrono>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -65,7 +67,6 @@ void Game::gameLoop()
                 }
             }
         }
-
         if(enter_to_game)
         {
             new_round();
@@ -302,6 +303,22 @@ void Game::end_of_game()
     sf::RectangleShape* end_of_round = new sf::RectangleShape(sf::Vector2f(900.0, 900.0));
     end_of_round->setTexture(texture1);
     end_of_round->setPosition(sf::Vector2f(0.0,view.getCenter().y-450.0));
+    //Zapis wyniku do pliku tekstowego
+    if (!file_updated)
+    {
+        std::ofstream file;
+        auto now = std::chrono::zoned_time{ std::chrono::current_zone(), floor<std::chrono::seconds>(std::chrono::system_clock::now()) }.get_local_time();
+        auto ld = floor<std::chrono::days>(now);
+        std::chrono::year_month_day ymd{ ld };
+        std::chrono::hh_mm_ss hms{ now - ld };
+        file.open("wyniki.txt", std::ios_base::app);
+        if (file.is_open())
+        {
+            file << player->get_PointsNumber() << ' ' << ymd << ' ' << hms << std::endl;
+        }
+        file_updated = true;
+    }
+
     window.draw(*end_of_round);
     window.draw(round->get_points_text(player, window.mapPixelToCoords({ 10,15 }), text_font));
 }

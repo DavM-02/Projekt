@@ -1,6 +1,7 @@
 #include "Round.h"
 #include "PlayerObject.h"
 
+
 Round::Round(int which_level)
 {
     add_rounds();
@@ -43,8 +44,6 @@ void Round::set_actual_texture(sf::Texture* _tex)
 
 void Round::draw_buttons(sf::RenderWindow& _window, sf::View& view)
 {
-
-
     sf::Texture* texture3 = new sf::Texture();
     texture3->loadFromFile("graj_dalej.png");
     sf::RectangleShape* graj_dalej = new sf::RectangleShape(sf::Vector2f(519.0, 52.0));
