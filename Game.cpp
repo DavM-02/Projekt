@@ -1,5 +1,7 @@
 ﻿#include "Game.h"
 #include <iostream>
+#include <string>
+#include <algorithm>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -12,6 +14,7 @@ Game::Game(sf::RenderWindow& _win, std::string _menu_texture) : window(_win)
     player = new PlayerObject({ 60.0,60.0 }, { 740.0,740.0 });
    // platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
     this->menu = new Menu(_menu_texture);
+
 }
 sf::RenderWindow& Game::getWindow()
 {
@@ -83,6 +86,8 @@ void Game::gameLoop()
         if(end_of_the_game)
         {
             window.clear(sf::Color::Black);
+            enter_to_game = false;
+            is_new_round = false;
             end_of_game();
         }
 
@@ -120,29 +125,30 @@ void Game::collision(const float& elapsed)
                 {
                     player->setPosition(player->getPosition().x, platforms[i]->getGlobalBounds().top - player->getGlobalBounds().height);
                     player->setOnGround(true);
-                    if (platforms[i]->getMovingState())
-                        player->move({ platforms[i]->get_velocity().x * elapsed,0.0 }); // Jeśli gracz stoi na ruchomej platformie, przesuń go o wartość prędkości platformy
                     player->set_velocityY(0);
-                    if(i == platforms.size()-1 && actual_level < 4)
+                    if (platforms[i]->getMovingState())
                     {
-                        is_new_round = true; //kiedy ukonczymy dany poziom
+                        player->move({ platforms[i]->get_velocity().x * elapsed,0.0 }); // Jeśli gracz stoi na ruchomej platformie, przesuń go o wartość prędkości platformy
                     }
-                    if(i == platforms.size()-1 && actual_level == 4)
+                    if(i == platforms.size()-1)
                     {
-                        end_of_the_game = true; //kiedy ukonczymy ostatni poziom - gra sie konczy
+                        if (actual_level == 4)
+                            end_of_the_game = true; //kiedy ukonczymy ostatni poziom - gra sie konczy
+                        if (actual_level < 4)
+                            is_new_round = true; //kiedy ukonczymy dany poziom;
+
+                        player->addPoints((1 / round_clock.restart().asSeconds()) * 10000);
                     }
                 }
                 else
                 {
-                    if (player_left < platform_right && player_left > platform_right - 4)
+                    if (player_left < platform_right && player_left > platform_right - 4) //Kolizja od prawej
                     {
-                        std::cout << "prawo" << std::endl;
                         player->setPosition(platform_right, player->getPosition().y);
                         player->set_velocityX(0);
                     }
-                    else if (player_right > platform_left && player_right < platform_left + 4)
+                    else if (player_right > platform_left && player_right < platform_left + 4) //Kolizja od lewej
                     {
-                        std::cout << "lewo" << std::endl;
                         player->setPosition(platform_left - player->getGlobalBounds().width, player->getPosition().y);
                         player->set_velocityX(0);
                     }
@@ -150,19 +156,16 @@ void Game::collision(const float& elapsed)
             }
             else if (player_top < platform_bot && player_left < platform_right && player_right > platform_left) //Kolizja od dolu
             {
-                std::cout << "dol" << std::endl;
                 player->setPosition(player->getPosition().x, platform_bot);
                 player->set_velocityY(0);
             }
-            else if (player_left < platform_right && player_right>platform_right && player_bot < platform_top)
+            else if (player_left < platform_right && player_right>platform_right && player_bot < platform_top) //Kolizja od prawej
             {
-                std::cout << "prawo" << std::endl;
                 player->setPosition(platform_right, player->getPosition().y);
                 player->set_velocityX(0);
             }
-            else if (player_right > platform_left && player_left < platform_right && player_bot < platform_top)
+            else if (player_right > platform_left && player_left < platform_right && player_bot < platform_top) //Kolizja od lewej
             {
-                std::cout << "lewo" << std::endl;
                 player->setPosition(platform_left - player->getGlobalBounds().width, player->getPosition().y);
                 player->set_velocityX(0);
             }
@@ -205,7 +208,7 @@ std::vector<PlatformObject*> Game::create_platforms()
     float position_y = 600;
     srand((unsigned)time(0));
     int acc = 0;
-    std::vector<PlatformObject*> platforms;
+    platforms.clear();
     PlatformObject* base_platform = new PlatformObject({0.0,800.0}, { 900.0, 18.0 },false);
     base_platform->setFillColor(sf::Color::Red);
     platforms.emplace_back(base_platform);
@@ -297,8 +300,8 @@ void Game::round_end()
     actual_round->scale(sf::Vector2f(1.3, 1.3));
     actual_round->setPosition(sf::Vector2f(80.0, view.getCenter().y-350.0));
     window.draw(*actual_round);
-
     round->draw_buttons(window,view);
+    window.draw(round->get_points_text(player, window.mapPixelToCoords({ 10,15 }), text_font)); 
 }
 
 void Game::end_of_game()
@@ -309,4 +312,5 @@ void Game::end_of_game()
     end_of_round->setTexture(texture1);
     end_of_round->setPosition(sf::Vector2f(0.0,view.getCenter().y-450.0));
     window.draw(*end_of_round);
+    window.draw(round->get_points_text(player, window.mapPixelToCoords({ 10,15 }), text_font));
 }

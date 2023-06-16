@@ -5,8 +5,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-
-
+#include "PlayerObject.h"
 class Round
 {
     int _level;
@@ -23,5 +22,6 @@ public:
     void draw_buttons(sf::RenderWindow& _window, sf::View& view);
     void draw_round(sf::RenderWindow& _window, sf::Vector2f pos);
     sf::Vector2f get_coordinates(int n);
+    sf::Text get_points_text(PlayerObject* player,const sf::Vector2f& text_coords,sf::Font& font);
 };
 

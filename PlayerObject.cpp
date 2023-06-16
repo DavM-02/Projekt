@@ -3,6 +3,14 @@ bool PlayerObject::getOnGround()
 {
 	return onGround;
 }
+void PlayerObject::addPoints(const int& _pts)
+{
+	PointsNumber += _pts;
+}
+int PlayerObject::get_PointsNumber()
+{
+	return PointsNumber;
+}
 void PlayerObject::setOnGround(bool _oG)
 {
 	onGround = _oG;

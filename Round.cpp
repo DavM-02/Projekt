@@ -1,5 +1,5 @@
-
 #include "Round.h"
+#include "PlayerObject.h"
 
 Round::Round(int which_level)
 {
@@ -44,6 +44,8 @@ void Round::set_actual_texture(sf::Texture* _tex)
 
 void Round::draw_buttons(sf::RenderWindow& _window, sf::View& view)
 {
+
+
     sf::Texture* texture3 = new sf::Texture();
     texture3->loadFromFile("graj_dalej.png");
     sf::RectangleShape* graj_dalej = new sf::RectangleShape(sf::Vector2f(519.0, 52.0));
@@ -80,4 +82,16 @@ void Round::draw_round(sf::RenderWindow& _window, sf::Vector2f pos)
 {
     actual_level->setPosition(pos);
     _window.draw(*actual_level);
+}
+
+sf::Text Round::get_points_text(PlayerObject* player,const sf::Vector2f& text_coords,sf::Font& font)
+{
+    if (!font.loadFromFile("Minecraft.ttf"))
+    {
+        throw("Missing font file!");
+    }
+    sf::Text *points_text=new sf::Text("Punkty: " + std::to_string(player->get_PointsNumber()),font,40);
+    points_text->setFillColor(sf::Color::Green);
+    points_text->setPosition(text_coords);
+    return *points_text;
 }

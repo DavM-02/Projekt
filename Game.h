@@ -17,7 +17,9 @@ private:
 	std::vector<PlatformObject*> platforms;
 	PlayerObject* player;
 	sf::Clock clock;
+	sf::Clock round_clock;
 	sf::Event event;
+	sf::Font text_font;
 	sf::Vector2f gravity = { 0.0,30.0 };
     Menu* menu;
     std::vector<sf::RectangleShape>imported_textures;
