@@ -5,14 +5,15 @@
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-Game::Game(sf::RenderWindow& _win, std::string _menu_texture) : window(_win)
+Game::Game(sf::RenderWindow& _win,const std::string& _menu_texture) : window(_win)
 {
     window.setFramerateLimit(120);
     sf::View _view(sf::FloatRect(0.f,0.f,900.f,900.f));
     window.setView(_view);
     view = _view;
     player = new PlayerObject({ 60.0,60.0 }, { 740.0,740.0 });
-    this->menu = new Menu(_menu_texture);
+    menu = new Menu(_menu_texture);
+    round = new Round(0);
 }
 sf::RenderWindow& Game::getWindow()
 {
@@ -23,8 +24,8 @@ void Game::gameLoop()
     while (window.isOpen())
     {
         menu->draw_initial_textures(window);
-        this->imported_textures = this->menu->get_positoned_textures();
-
+        imported_textures = menu->get_positoned_textures();
+        sf::Event event;
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
@@ -34,35 +35,34 @@ void Game::gameLoop()
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space && enter_to_game) //Sprawdza czy zostala wscisnieta spacja
             {
                 player->jump();
-
             }
             if(event.type == sf::Event::MouseButtonPressed)
             {
-                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[0].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[0].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[0].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[0].getPosition().y+52 && !enter_to_game)
-                    {
-                        enter_to_game = true; //gdy user kliknal przycisk "graj"
-                        clock.restart();
-                        platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
-                        this->round = new Round(actual_level);  //tworzenie instancji klasy round
-                    }
-                    if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[1].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[1].getPosition().x+512 && sf::Mouse::getPosition(window).y >= imported_textures[1].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[1].getPosition().y+52 && !enter_to_game && !is_new_round)
-                    {
-                        window.close();
-                    }
-                    if(event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709.0 && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) >= view.getCenter().y && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) <= view.getCenter().y+52 && is_new_round && !enter_to_game && actual_level < 4)
-                    {
-                        player->setPosition(sf::Vector2f(740.0,740.0));
-                        enter_to_game = true;
-                        is_new_round = false;
-                        clock.restart();
-                        platforms = create_platforms();
-                        actual_level++;
-                        this->round = new Round(actual_level);  //tworzenie instancji klasy round
-                    }
-                    if(event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709.0 && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) >= view.getCenter().y+150 && (sf::Mouse::getPosition(window).y+view.getCenter().y-450) <= view.getCenter().y+202 && is_new_round && !enter_to_game && actual_level < 4)
-                    {
-                        window.close();
-                    }
+                if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[0].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[0].getPosition().x + 512 && sf::Mouse::getPosition(window).y >= imported_textures[0].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[0].getPosition().y + 52 && !enter_to_game)
+                {
+                    enter_to_game = true; //gdy user kliknal przycisk "graj"
+                    clock.restart();
+                    platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
+                    round = new Round(actual_level);  //tworzenie instancji klasy round
+                }
+                if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[1].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[1].getPosition().x + 512 && sf::Mouse::getPosition(window).y >= imported_textures[1].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[1].getPosition().y + 52 && !enter_to_game && !is_new_round)
+                {
+                    window.close();
+                }
+                if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709.0 && (sf::Mouse::getPosition(window).y + view.getCenter().y - 450) >= view.getCenter().y && (sf::Mouse::getPosition(window).y + view.getCenter().y - 450) <= view.getCenter().y + 52 && is_new_round && !enter_to_game && actual_level < 4)
+                {
+                    player->setPosition(sf::Vector2f(740.0,740.0));
+                    enter_to_game = true;
+                    is_new_round = false;
+                    clock.restart();
+                    platforms = create_platforms();
+                    actual_level++;
+                    round = new Round(actual_level);  //tworzenie instancji klasy round
+                }
+                if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709.0 && (sf::Mouse::getPosition(window).y + view.getCenter().y - 450) >= view.getCenter().y + 150 && (sf::Mouse::getPosition(window).y + view.getCenter().y - 450) <= view.getCenter().y + 202 && is_new_round && !enter_to_game && actual_level < 4)
+                {
+                    window.close();
+                }
             }
         }
 
@@ -84,7 +84,6 @@ void Game::gameLoop()
             is_new_round = false;
             end_of_game();
         }
-
         window.display();
     }
 }
@@ -94,9 +93,8 @@ void Game::move_window()
     {
         view.move(sf::Vector2f{0,player->getPosition().y+30-view.getCenter().y}); //przesuwanie ekranu w pionie w zaleznosci od polozenia srodka widoku
     }
-
     window.setView(view);
-    this->round->draw_round(window, sf::Vector2f(-45.0, view.getCenter().y-440)); //rysowanie numeru rundy
+    round->draw_round(window, sf::Vector2f(-45.0, view.getCenter().y-440)); //rysowanie numeru rundy
 }
 void Game::collision(const float& elapsed)
 {
@@ -124,7 +122,7 @@ void Game::collision(const float& elapsed)
                     {
                         player->move({ platforms[i]->get_velocity().x * elapsed,0.0 }); // Jeśli gracz stoi na ruchomej platformie, przesuń go o wartość prędkości platformy
                     }
-                    if(i == platforms.size()-1)
+                    if (i == platforms.size() - 1)
                     {
                         if (actual_level == 4)
                             end_of_the_game = true; //kiedy ukonczymy ostatni poziom - gra sie konczy
@@ -182,12 +180,12 @@ void Game::window_collision()
     }
     for (int i = 1; i < platforms.size(); i++)
     {
-        if (platforms[i]->getPosition().x + platforms[i]->getGlobalBounds().width >= window.getSize().x) // Kolizja platformy
+        if (platforms[i]->getPosition().x + platforms[i]->getGlobalBounds().width >= window.getSize().x) //Kolizja platformy od prawej strony
         {
             platforms[i]->set_velocityX(platforms[i]->get_velocity().x * (-1));
             platforms[i]->setPosition(window.getSize().x - platforms[i]->getGlobalBounds().width, platforms[i]->getPosition().y);
         }
-        else if (platforms[i]->getPosition().x <= 0)
+        else if (platforms[i]->getPosition().x <= 0) //Kolizja platformy od lewej strony
         {
             platforms[i]->set_velocityX(platforms[i]->get_velocity().x * (-1));
             platforms[i]->setPosition(0, platforms[i]->getPosition().y);

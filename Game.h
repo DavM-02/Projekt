@@ -18,7 +18,6 @@ private:
 	PlayerObject* player;
 	sf::Clock clock;
 	sf::Clock round_clock;
-	sf::Event event;
 	sf::Font text_font;
     Menu* menu;
     std::vector<sf::RectangleShape>imported_textures;
@@ -28,7 +27,7 @@ private:
     bool end_of_the_game = false;
     int actual_level = 0;
 public:
-    Game(sf::RenderWindow&, std::string _menu_texture);
+    Game(sf::RenderWindow&,const std::string& _menu_texture);
 	~Game() {}
 	sf::RenderWindow& getWindow();
 	void gameLoop();
