@@ -3,7 +3,6 @@
 #include <string>
 #include <algorithm>
 #include <fstream>
-#include <chrono>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -306,7 +305,8 @@ void Game::end_of_game()
     //Zapis wyniku do pliku tekstowego
     if (!file_updated)
     {
-        std::ofstream file;
+        std::fstream file;
+        /*
         auto now = std::chrono::zoned_time{ std::chrono::current_zone(), floor<std::chrono::seconds>(std::chrono::system_clock::now()) }.get_local_time();
         auto ld = floor<std::chrono::days>(now);
         std::chrono::year_month_day ymd{ ld };
@@ -315,6 +315,12 @@ void Game::end_of_game()
         if (file.is_open())
         {
             file << player->get_PointsNumber() << ' ' << ymd << ' ' << hms << std::endl;
+        }
+        */
+        file.open("wyniki.txt", std::ios_base::app);
+        if (file.is_open())
+        {
+            file << player->get_PointsNumber() << std::endl;
         }
         file_updated = true;
     }
