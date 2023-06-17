@@ -1,13 +1,13 @@
-
 #include "Round.h"
+#include "PlayerObject.h"
+
 
 Round::Round(int which_level)
 {
     add_rounds();
-
     sf::Texture* texture = new sf::Texture();
     texture = rounds[which_level];
-    this->actual_level = new sf::RectangleShape(sf::Vector2f(600.0, 80.0));
+    actual_level = new sf::RectangleShape(sf::Vector2f(600.0, 80.0));
     actual_level->setTexture(texture);
     actual_level->scale(sf::Vector2f(0.6, 0.6));
     actual_level->setFillColor(sf::Color(255,255,255,128));
@@ -34,12 +34,12 @@ void Round::add_rounds()
 
 sf::Texture* Round::get_some_texture(int& i)
 {
-    return this->rounds[i];
+    return rounds[i];
 }
 
 void Round::set_actual_texture(sf::Texture* _tex)
 {
-    this->actual_texture = _tex;
+    actual_texture = _tex;
 }
 
 void Round::draw_buttons(sf::RenderWindow& _window, sf::View& view)
@@ -68,16 +68,28 @@ sf::Vector2f Round::get_coordinates(int n)
 {
     if(n == 0)
     {
-        return this->first_button_coordinates;
+        return first_button_coordinates;
     }
     else if(n == 1)
     {
-        return this->second_button_coordinates;
+        return second_button_coordinates;
     }
 }
 
-void Round::draw_round(sf::RenderWindow& _window, sf::Vector2f pos)
+void Round::draw_round(sf::RenderWindow& _window, const sf::Vector2f& pos)
 {
     actual_level->setPosition(pos);
     _window.draw(*actual_level);
+}
+
+sf::Text Round::get_points_text(PlayerObject* player,const sf::Vector2f& text_coords,sf::Font& font)
+{
+    if (!font.loadFromFile("Minecraft.ttf"))
+    {
+        throw("Missing font file!");
+    }
+    sf::Text *points_text=new sf::Text("Punkty: " + std::to_string(player->get_PointsNumber()),font,40);
+    points_text->setFillColor(sf::Color::Green);
+    points_text->setPosition(text_coords);
+    return *points_text;
 }

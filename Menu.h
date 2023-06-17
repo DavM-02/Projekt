@@ -13,7 +13,7 @@ class Menu
     std::vector<sf::Texture*>_other_textures;
     std::vector<sf::RectangleShape>positoned_textures;
 public:
-    Menu(std::string _texture_file);
+    Menu(const std::string& _texture_file);
     sf::Sprite* get_main_texture();
     void set_textures();
     std::vector<sf::RectangleShape> get_positoned_textures();

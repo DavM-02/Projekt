@@ -3,11 +3,19 @@ bool PlayerObject::getOnGround()
 {
 	return onGround;
 }
+void PlayerObject::addPoints(const int& _pts)
+{
+	PointsNumber += _pts;
+}
+int PlayerObject::get_PointsNumber()
+{
+	return PointsNumber;
+}
 void PlayerObject::setOnGround(bool _oG)
 {
 	onGround = _oG;
 }
-void PlayerObject::animate(const float& elapsed,sf::Vector2f gravity)
+void PlayerObject::animate(const float& elapsed)
 {
 	float old_height = getPosition().y;
     move((velocity += gravity) * elapsed); //Dodaje do pozycji wartosc predkosci+grawitacji

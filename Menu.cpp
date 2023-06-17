@@ -1,13 +1,13 @@
 #include "Menu.h"
 
-Menu::Menu(std::string _texture_file)
+Menu::Menu(const std::string& _texture_file)
 {
     main_texture = new sf::Texture();
     if(!main_texture->loadFromFile(_texture_file))
     {
         throw("Missing texture file!");
     }
-    this->_texture = new sf::Sprite(*main_texture);
+    _texture = new sf::Sprite(*main_texture);
     sf::Texture* texture_tmp = new sf::Texture();
     if(!texture_tmp->loadFromFile("first_button.png"))
     {
@@ -44,7 +44,7 @@ void Menu::set_textures()
 
 sf::Sprite* Menu::get_main_texture()
 {
-    return this->_texture;
+    return _texture;
 }
 
 std::vector<sf::RectangleShape> Menu::get_positoned_textures()
