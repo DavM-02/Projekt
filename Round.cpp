@@ -82,14 +82,32 @@ void Round::draw_round(sf::RenderWindow& _window, const sf::Vector2f& pos)
     _window.draw(*actual_level);
 }
 
-sf::Text Round::get_points_text(PlayerObject* player,const sf::Vector2f& text_coords,sf::Font& font)
+sf::Text Round::get_text(PlayerObject* player,const sf::Vector2f& text_coords,sf::Font& font)
 {
     if (!font.loadFromFile("Minecraft.ttf"))
     {
         throw("Missing font file!");
     }
-    sf::Text *points_text=new sf::Text("Punkty: " + std::to_string(player->get_PointsNumber()),font,40);
+    sf::Text *points_text=new sf::Text("Twoje Punkty: " + std::to_string(player->get_PointsNumber()),font,40);
     points_text->setFillColor(sf::Color::Green);
     points_text->setPosition(text_coords);
     return *points_text;
 }
+sf::Text Round::get_text(const std::vector<int>& points, const sf::Vector2f& text_coords, sf::Font& font)
+{
+    if (!font.loadFromFile("Minecraft.ttf"))
+    {
+        throw("Missing font file!");
+    }
+    sf::Text* highest_scores = new sf::Text(
+        "TOP 5 WYNIKOW:\n1: " + std::to_string(points[0]) +
+        "\n2: " + std::to_string(points[1]) +
+        "\n3: " + std::to_string(points[2]) +
+        "\n4: " + std::to_string(points[3]) +
+        "\n5: " + std::to_string(points[4])
+        ,font, 45);
+    highest_scores->setFillColor(sf::Color::Magenta);
+    highest_scores->setPosition(text_coords);
+    return *highest_scores;
+}
+
