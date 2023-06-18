@@ -16,13 +16,13 @@ private:
 	sf::RenderWindow& window;
 	sf::View view;
 	std::vector<PlatformObject*> platforms;
+	std::vector<int> points;
 	PlayerObject* player;
 	sf::Clock clock;
 	sf::Clock round_clock;
 	sf::Font text_font;
     Menu* menu;
     std::vector<sf::RectangleShape>imported_textures;
-    std::vector<float>get_y_coordinates();
     Round* round;
     Bonus* bonus;
     bool enter_to_game = false;
@@ -34,6 +34,7 @@ public:
     Game(sf::RenderWindow&,const std::string& _menu_texture);
 	~Game() {}
 	sf::RenderWindow& getWindow();
+    std::vector<float>get_y_coordinates();
 	void gameLoop();
     void move_window();
 	void collision(const float& elapsed);
