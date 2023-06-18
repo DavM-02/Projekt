@@ -8,6 +8,7 @@
 #include "GameObject.h"
 #include "Menu.h"
 #include "Round.h"
+#include "bonus.h"
 
 class Game
 {
@@ -21,7 +22,9 @@ private:
 	sf::Font text_font;
     Menu* menu;
     std::vector<sf::RectangleShape>imported_textures;
+    std::vector<float>get_y_coordinates();
     Round* round;
+    Bonus* bonus;
     bool enter_to_game = false;
     bool is_new_round = false;
     bool end_of_the_game = false;

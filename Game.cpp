@@ -15,6 +15,7 @@ Game::Game(sf::RenderWindow& _win,const std::string& _menu_texture) : window(_wi
     player = new PlayerObject({ 60.0,60.0 }, { 740.0,740.0 });
     menu = new Menu(_menu_texture);
     round = new Round(0);
+    bonus = new Bonus();
 }
 sf::RenderWindow& Game::getWindow()
 {
@@ -45,6 +46,7 @@ void Game::gameLoop()
                     clock.restart();
                     platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
                     round = new Round(actual_level);  //tworzenie instancji klasy round
+                    bonus->generate_coins(get_y_coordinates());
                 }
                 if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[1].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[1].getPosition().x + 512 && sf::Mouse::getPosition(window).y >= imported_textures[1].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[1].getPosition().y + 52 && !enter_to_game && !is_new_round)
                 {
@@ -59,6 +61,7 @@ void Game::gameLoop()
                     platforms = create_platforms();
                     actual_level++;
                     round = new Round(actual_level);  //tworzenie instancji klasy round
+                    bonus->generate_coins(get_y_coordinates());
                 }
                 if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709.0 && (sf::Mouse::getPosition(window).y + view.getCenter().y - 450) >= view.getCenter().y + 150 && (sf::Mouse::getPosition(window).y + view.getCenter().y - 450) <= view.getCenter().y + 202 && is_new_round && !enter_to_game && actual_level < 4)
                 {
@@ -72,9 +75,12 @@ void Game::gameLoop()
         }
         if(is_new_round)
         {
+            player->addPoints(bonus->get_bonus());
             enter_to_game = false;
             window.clear(sf::Color::Black);
             round_end();
+            bonus->set_conditions_and_values();
+            bonus->erase_vector();
         }
 
         if(end_of_the_game)
@@ -271,6 +277,7 @@ void Game::new_round()
         window.draw(*platforms[i]);
         platforms[i]->animate(elapsed);
     }
+    bonus->draw_coins(window,player->getGlobalBounds());
     window.draw(*player);
     move_window();
 }
@@ -327,4 +334,15 @@ void Game::end_of_game()
 
     window.draw(*end_of_round);
     window.draw(round->get_points_text(player, window.mapPixelToCoords({ 10,15 }), text_font));
+}
+
+std::vector<float> Game::get_y_coordinates()
+{
+    std::vector<float>coordinates;
+    for(auto& element : platforms)
+    {
+        coordinates.emplace_back(element->getPosition().y);
+    }
+
+    return coordinates;
 }
