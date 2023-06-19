@@ -16,6 +16,6 @@ public:
 	void set_velocityX(const float& _velocity_x);
 	void set_velocityY(const float& _velocity_y);
 	sf::Vector2f get_velocity();
-	virtual void animate(const float& elapsed)=0;
+	virtual void animate(const float& elapsed) = 0;
 };
 

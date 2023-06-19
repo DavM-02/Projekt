@@ -6,10 +6,10 @@
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-Game::Game(sf::RenderWindow& _win,const std::string& _menu_texture) : window(_win)
+Game::Game(sf::RenderWindow& _win, const std::string& _menu_texture) : window(_win)
 {
     window.setFramerateLimit(120);
-    sf::View _view(sf::FloatRect(0.f,0.f,900.f,900.f));
+    sf::View _view(sf::FloatRect(0.f, 0.f, 900.f, 900.f));
     window.setView(_view);
     view = _view;
     player = new PlayerObject({ 60.0,60.0 }, { 740.0,740.0 });
@@ -47,12 +47,12 @@ void Game::gameLoop()
             {
                 player->jump();
             }
-            if(event.type == sf::Event::MouseButtonPressed)
+            if (event.type == sf::Event::MouseButtonPressed)
             {
                 //Wciśnięcie przycisku "Graj"
                 if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[0].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[0].getPosition().x + 512 && sf::Mouse::getPosition(window).y >= imported_textures[0].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[0].getPosition().y + 52 && !enter_to_game)
                 {
-                    enter_to_game = true; 
+                    enter_to_game = true;
                     clock.restart();
                     platforms = create_platforms(); //Tworzymy wektor platform i zapisujemy tam platformy utworzone za pomoca funkcji
                     round = new Round(actual_level);  //tworzenie instancji klasy round
@@ -66,7 +66,7 @@ void Game::gameLoop()
                 //Wciśnięcie przycisku "Graj"
                 if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709.0 && (sf::Mouse::getPosition(window).y + view.getCenter().y - 450) >= view.getCenter().y && (sf::Mouse::getPosition(window).y + view.getCenter().y - 450) <= view.getCenter().y + 52 && is_new_round && !enter_to_game && actual_level < 4)
                 {
-                    player->setPosition(sf::Vector2f(740.0,740.0));
+                    player->setPosition(sf::Vector2f(740.0, 740.0));
                     enter_to_game = true;
                     is_new_round = false;
                     clock.restart();
@@ -81,11 +81,11 @@ void Game::gameLoop()
                 }
             }
         }
-        if(enter_to_game)
+        if (enter_to_game)
         {
             new_round();
         }
-        if(is_new_round)
+        if (is_new_round)
         {
             player->addPoints(bonus->get_bonus());
             enter_to_game = false;
@@ -95,24 +95,38 @@ void Game::gameLoop()
             bonus->erase_vector();
         }
 
-        if(end_of_the_game)
+        if (end_of_the_game)
         {
             window.clear(sf::Color::Black);
             enter_to_game = false;
             is_new_round = false;
             end_of_game();
         }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+            end_game_esc_ = true;
+        }
+
+        if (end_game_esc_)
+        {
+            window.clear(sf::Color::Black);
+            enter_to_game = false;
+            is_new_round = false;
+            end_of_the_game = false;
+            end_game_esc();
+        }
+
         window.display();
     }
 }
 void Game::move_window()
 {
-    if(view.getCenter().y != player->getPosition().y+30)
+    if (view.getCenter().y != player->getPosition().y + 30)
     {
-        view.move(sf::Vector2f{0,player->getPosition().y+30-view.getCenter().y}); //przesuwanie ekranu w pionie w zaleznosci od polozenia srodka widoku
+        view.move(sf::Vector2f{ 0,player->getPosition().y + 30 - view.getCenter().y }); //przesuwanie ekranu w pionie w zaleznosci od polozenia srodka widoku
     }
     window.setView(view);
-    round->draw_round(window, sf::Vector2f(-45.0, view.getCenter().y-440)); //rysowanie numeru rundy
+    round->draw_round(window, sf::Vector2f(-45.0, view.getCenter().y - 440)); //rysowanie numeru rundy
 }
 void Game::collision(const float& elapsed)
 {
@@ -218,13 +232,13 @@ std::vector<PlatformObject*> Game::create_platforms()
     srand((unsigned)time(0));
     int acc = 0;
     platforms.clear();
-    PlatformObject* base_platform = new PlatformObject({0.0,800.0}, { 900.0, 18.0 },false);
+    PlatformObject* base_platform = new PlatformObject({ 0.0,800.0 }, { 900.0, 18.0 }, false);
     base_platform->setFillColor(sf::Color::Red);
     platforms.emplace_back(base_platform);
 
     while (position_y >= -1000)
     {
-        PlatformObject* platform = new PlatformObject({ 130.0,18.0 },true); //Zamiast platformy jako RectangleShape robimy platformy jako PlatformObject
+        PlatformObject* platform = new PlatformObject({ 130.0,18.0 }, true); //Zamiast platformy jako RectangleShape robimy platformy jako PlatformObject
         float tmp = rand() % 780;
         if (acc >= 1) //aby w miare rozsadnych odleglosciach sie te platformy respily xD
         {
@@ -289,7 +303,7 @@ void Game::new_round()
         window.draw(*platforms[i]);
         platforms[i]->animate(elapsed);
     }
-    bonus->draw_coins(window,player->getGlobalBounds());
+    bonus->draw_coins(window, player->getGlobalBounds());
     window.draw(*player);
     move_window();
 }
@@ -300,7 +314,7 @@ void Game::round_end()
     texture1->loadFromFile("_ukonczona.png");
     sf::RectangleShape* end_of_round = new sf::RectangleShape(sf::Vector2f(900.0, 900.0));
     end_of_round->setTexture(texture1);
-    end_of_round->setPosition(sf::Vector2f(0.0,view.getCenter().y-450.0));
+    end_of_round->setPosition(sf::Vector2f(0.0, view.getCenter().y - 450.0));
     window.draw(*end_of_round);
 
     sf::Texture* texture2 = new sf::Texture();
@@ -308,11 +322,12 @@ void Game::round_end()
     sf::RectangleShape* actual_round = new sf::RectangleShape(sf::Vector2f(600.0, 80.0));
     actual_round->setTexture(texture2);
     actual_round->scale(sf::Vector2f(1.3, 1.3));
-    actual_round->setPosition(sf::Vector2f(80.0, view.getCenter().y-350.0));
+    actual_round->setPosition(sf::Vector2f(80.0, view.getCenter().y - 350.0));
     window.draw(*actual_round);
-    round->draw_buttons(window,view);
-    window.draw(round->get_text(player, window.mapPixelToCoords({ 10,15 }), text_font)); 
+    round->draw_buttons(window, view);
+    window.draw(round->get_text(player, window.mapPixelToCoords({ 10,15 }), text_font));
 }
+
 
 void Game::end_of_game()
 {
@@ -320,7 +335,7 @@ void Game::end_of_game()
     texture1->loadFromFile("end_of_game.png");
     sf::RectangleShape* end_of_round = new sf::RectangleShape(sf::Vector2f(900.0, 900.0));
     end_of_round->setTexture(texture1);
-    end_of_round->setPosition(sf::Vector2f(0.0,view.getCenter().y-450.0));
+    end_of_round->setPosition(sf::Vector2f(0.0, view.getCenter().y - 450.0));
     //Zapis wyniku do pliku tekstowego oraz odczyt wyników
     if (!file_updated)
     {
@@ -357,6 +372,42 @@ void Game::end_of_game()
     }
 
     window.draw(*end_of_round);
+    window.draw(round->get_text(player, window.mapPixelToCoords({ 10,15 }), text_font));//Rysuje liczbe sume punktow zdobyta przez gracza w aktualnej grze
+    window.draw(round->get_text(points, window.mapPixelToCoords({ 350,550 }), text_font));//Rysuje top 5 punktów z pliku
+}
+
+void Game::end_game_esc()
+{
+    sf::Texture* texture1 = new sf::Texture();
+    texture1->loadFromFile("gameover.png");
+    sf::RectangleShape* end_game_esc = new sf::RectangleShape(sf::Vector2f(900.0, 900.0));
+    end_game_esc->setTexture(texture1);
+    end_game_esc->setPosition(sf::Vector2f(0.0, view.getCenter().y - 500.0));
+    //Zapis wyniku do pliku tekstowego oraz odczyt wyników
+    if (!file_updated)
+    {
+        std::fstream file;
+        std::string points_from_file;
+        file.open("wyniki.txt", std::ios_base::app);
+        if (file.is_open())
+        {
+            file << player->get_PointsNumber() << std::endl << std::flush;
+        }
+        file.close();
+        file.open("wyniki.txt", std::ios::in | std::ios::out);
+        if (file.is_open())
+        {
+            while (getline(file, points_from_file))
+            {
+                points.emplace_back(std::stoi(points_from_file));
+            }
+        }
+        std::sort(points.begin(), points.end(), [](int a, int b) {return a > b; });
+        file.close();
+        file_updated = true;
+    }
+
+    window.draw(*end_game_esc);
     window.draw(round->get_text(player, window.mapPixelToCoords({ 10,15 }), text_font));//Rysuje liczbe sume punktow zdobyta przez gracza w aktualnej grze
     window.draw(round->get_text(points, window.mapPixelToCoords({ 350,550 }), text_font));//Rysuje top 5 punktów z pliku
 }

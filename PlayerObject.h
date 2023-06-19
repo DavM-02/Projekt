@@ -4,7 +4,7 @@ class PlayerObject : public GameObject
 {
 private:
 	bool onGround = false;
-	int PointsNumber=0;
+	int PointsNumber = 0;
 public:
 	PlayerObject(sf::Vector2f _size, sf::Vector2f _position) :GameObject(_size, _position) {}
 	bool getOnGround();

@@ -18,7 +18,7 @@ void PlayerObject::setOnGround(bool _oG)
 void PlayerObject::animate(const float& elapsed)
 {
 	float old_height = getPosition().y;
-    move((velocity += gravity) * elapsed); //Dodaje do pozycji wartosc predkosci+grawitacji
+	move((velocity += gravity) * elapsed); //Dodaje do pozycji wartosc predkosci+grawitacji
 	float new_height = getPosition().y;
 	if (new_height != old_height)
 		onGround = false;

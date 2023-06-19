@@ -11,8 +11,8 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(900, 900), "Platformówka SFML");
 	std::string menu_texture = "menu_giery.png";
-	Game* game = new Game(window,menu_texture);
+	Game* game = new Game(window, menu_texture);
 	game->gameLoop();
 	delete game;
 	return 0;
-}	
+}

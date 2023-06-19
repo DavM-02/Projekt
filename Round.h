@@ -10,8 +10,8 @@ class Round
 {
     int _level;
     std::vector<sf::Texture*>rounds;
-    sf::Vector2f first_button_coordinates = sf::Vector2f(1.0,1.0);
-    sf::Vector2f second_button_coordinates = sf::Vector2f(1.0,1.0); //wspolrzedne przyciskow graj dalej i zakoncz po ukonczeniu kazdej z rund
+    sf::Vector2f first_button_coordinates = sf::Vector2f(1.0, 1.0);
+    sf::Vector2f second_button_coordinates = sf::Vector2f(1.0, 1.0); //wspolrzedne przyciskow graj dalej i zakoncz po ukonczeniu kazdej z rund
     sf::Texture* actual_texture;
     sf::RectangleShape* actual_level;
 public:
@@ -22,7 +22,7 @@ public:
     void draw_buttons(sf::RenderWindow& _window, sf::View& view);
     void draw_round(sf::RenderWindow& _window, const sf::Vector2f& pos);
     sf::Vector2f get_coordinates(int n);
-    sf::Text get_text(PlayerObject* player,const sf::Vector2f& text_coords,sf::Font& font);
+    sf::Text get_text(PlayerObject* player, const sf::Vector2f& text_coords, sf::Font& font);
     sf::Text get_text(const std::vector<int>& points, const sf::Vector2f& text_coords, sf::Font& font);
 };
 

@@ -10,7 +10,7 @@ Round::Round(int which_level)
     actual_level = new sf::RectangleShape(sf::Vector2f(600.0, 80.0));
     actual_level->setTexture(texture);
     actual_level->scale(sf::Vector2f(0.6, 0.6));
-    actual_level->setFillColor(sf::Color(255,255,255,128));
+    actual_level->setFillColor(sf::Color(255, 255, 255, 128));
 }
 
 void Round::add_rounds()
@@ -55,9 +55,9 @@ void Round::draw_buttons(sf::RenderWindow& _window, sf::View& view)
     texture4->loadFromFile("second_button.png");
     sf::RectangleShape* zakoncz = new sf::RectangleShape(sf::Vector2f(519.0, 52.0));
     zakoncz->setTexture(texture4);
-    zakoncz->setPosition(sf::Vector2f(190.0, view.getCenter().y+150));
+    zakoncz->setPosition(sf::Vector2f(190.0, view.getCenter().y + 150));
     _window.draw(*zakoncz);
-    if(first_button_coordinates == sf::Vector2f(0.0,0.0) && second_button_coordinates == sf::Vector2f(0.0,0.0))
+    if (first_button_coordinates == sf::Vector2f(0.0, 0.0) && second_button_coordinates == sf::Vector2f(0.0, 0.0))
     {
         first_button_coordinates = graj_dalej->getPosition();
         second_button_coordinates = zakoncz->getPosition();
@@ -66,11 +66,11 @@ void Round::draw_buttons(sf::RenderWindow& _window, sf::View& view)
 
 sf::Vector2f Round::get_coordinates(int n)
 {
-    if(n == 0)
+    if (n == 0)
     {
         return first_button_coordinates;
     }
-    else if(n == 1)
+    else if (n == 1)
     {
         return second_button_coordinates;
     }
@@ -82,13 +82,13 @@ void Round::draw_round(sf::RenderWindow& _window, const sf::Vector2f& pos)
     _window.draw(*actual_level);
 }
 
-sf::Text Round::get_text(PlayerObject* player,const sf::Vector2f& text_coords,sf::Font& font)
+sf::Text Round::get_text(PlayerObject* player, const sf::Vector2f& text_coords, sf::Font& font)
 {
     if (!font.loadFromFile("Minecraft.ttf"))
     {
         throw("Missing font file!");
     }
-    sf::Text *points_text=new sf::Text("Twoje Punkty: " + std::to_string(player->get_PointsNumber()),font,40);
+    sf::Text* points_text = new sf::Text("Twoje Punkty: " + std::to_string(player->get_PointsNumber()), font, 40);
     points_text->setFillColor(sf::Color::Green);
     points_text->setPosition(text_coords);
     return *points_text;
@@ -105,7 +105,7 @@ sf::Text Round::get_text(const std::vector<int>& points, const sf::Vector2f& tex
         "\n3: " + std::to_string(points[2]) +
         "\n4: " + std::to_string(points[3]) +
         "\n5: " + std::to_string(points[4])
-        ,font, 45);
+        , font, 45);
     highest_scores->setFillColor(sf::Color::Magenta);
     highest_scores->setPosition(text_coords);
     return *highest_scores;
