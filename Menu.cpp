@@ -39,6 +39,7 @@ void Menu::set_textures()
         _texture->setPosition(sf::Vector2f(191.0, position_y));
         position_y += 150;
         positoned_textures.emplace_back(*_texture);
+        delete _texture;//!
     }
 }
 

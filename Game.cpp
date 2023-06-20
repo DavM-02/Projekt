@@ -32,6 +32,13 @@ std::vector<float> Game::get_y_coordinates()
 }
 void Game::gameLoop()
 {
+    sf::String playerInput;
+    sf::Font f;
+    f.loadFromFile("Minecraft.ttf");
+    playerText.setFont(f);
+    playerText.setCharacterSize(40);
+    playerText.setPosition(window.mapPixelToCoords({ 200,650 }));
+    playerText.setString("Podaj swoje imie: ");
     while (window.isOpen())
     {
         menu->draw_initial_textures(window);
@@ -39,6 +46,12 @@ void Game::gameLoop()
         sf::Event event;
         while (window.pollEvent(event))
         {
+            if (event.type == sf::Event::TextEntered && !enter_to_game && !is_new_round)
+            {
+                playerInput += event.text.unicode;
+                playerText.setString("Podaj swoje imie: "+playerInput);
+                std::cout << playerInput.toAnsiString() << std::endl;
+            }
             if (event.type == sf::Event::Closed)
             {
                 window.close();
@@ -58,12 +71,12 @@ void Game::gameLoop()
                     round = new Round(actual_level);  //tworzenie instancji klasy round
                     bonus->generate_coins(get_y_coordinates());
                 }
-                //Wciśnięcie przycisku "Zakończ
+                //Wciśnięcie przycisku "Zakończ"
                 if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= imported_textures[1].getPosition().x && sf::Mouse::getPosition(window).x <= imported_textures[1].getPosition().x + 512 && sf::Mouse::getPosition(window).y >= imported_textures[1].getPosition().y && sf::Mouse::getPosition(window).y <= imported_textures[1].getPosition().y + 52 && !enter_to_game && !is_new_round)
                 {
                     window.close();
                 }
-                //Wciśnięcie przycisku "Graj"
+                //Wciśnięcie przycisku "Graj dalej"
                 if (event.mouseButton.button == sf::Mouse::Left && sf::Mouse::getPosition(window).x >= 190.0 && sf::Mouse::getPosition(window).x <= 709.0 && (sf::Mouse::getPosition(window).y + view.getCenter().y - 450) >= view.getCenter().y && (sf::Mouse::getPosition(window).y + view.getCenter().y - 450) <= view.getCenter().y + 52 && is_new_round && !enter_to_game && actual_level < 4)
                 {
                     player->setPosition(sf::Vector2f(740.0, 740.0));
@@ -115,7 +128,8 @@ void Game::gameLoop()
             end_of_the_game = false;
             end_game_esc();
         }
-
+        if(!enter_to_game && !is_new_round)
+             window.draw(playerText);
         window.display();
     }
 }
@@ -326,6 +340,7 @@ void Game::round_end()
     window.draw(*actual_round);
     round->draw_buttons(window, view);
     window.draw(round->get_text(player, window.mapPixelToCoords({ 10,15 }), text_font));
+
 }
 
 
@@ -373,7 +388,7 @@ void Game::end_of_game()
 
     window.draw(*end_of_round);
     window.draw(round->get_text(player, window.mapPixelToCoords({ 10,15 }), text_font));//Rysuje liczbe sume punktow zdobyta przez gracza w aktualnej grze
-    window.draw(round->get_text(points, window.mapPixelToCoords({ 350,550 }), text_font));//Rysuje top 5 punktów z pliku
+    window.draw(round->get_text(points, window.mapPixelToCoords({ 350,550 }), text_font,names));//Rysuje top 5 punktów z pliku
 }
 
 void Game::end_game_esc()
@@ -388,26 +403,28 @@ void Game::end_game_esc()
     {
         std::fstream file;
         std::string points_from_file;
+        std::string name;
         file.open("wyniki.txt", std::ios_base::app);
         if (file.is_open())
         {
-            file << player->get_PointsNumber() << std::endl << std::flush;
+            file << playerInput.toAnsiString() << ' ' << player->get_PointsNumber() << std::endl << std::flush;
         }
         file.close();
         file.open("wyniki.txt", std::ios::in | std::ios::out);
         if (file.is_open())
         {
-            while (getline(file, points_from_file))
+            while (file >> name >> points_from_file)
             {
                 points.emplace_back(std::stoi(points_from_file));
             }
+            std::sort(points.begin(), points.end(), [](int a, int b) {return a > b; });
+
         }
-        std::sort(points.begin(), points.end(), [](int a, int b) {return a > b; });
         file.close();
         file_updated = true;
     }
 
     window.draw(*end_game_esc);
     window.draw(round->get_text(player, window.mapPixelToCoords({ 10,15 }), text_font));//Rysuje liczbe sume punktow zdobyta przez gracza w aktualnej grze
-    window.draw(round->get_text(points, window.mapPixelToCoords({ 350,550 }), text_font));//Rysuje top 5 punktów z pliku
+    window.draw(round->get_text(points, window.mapPixelToCoords({ 350,550 }), text_font,names));//Rysuje top 5 punktów z pliku
 }

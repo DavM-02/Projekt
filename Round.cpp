@@ -93,7 +93,7 @@ sf::Text Round::get_text(PlayerObject* player, const sf::Vector2f& text_coords, 
     points_text->setPosition(text_coords);
     return *points_text;
 }
-sf::Text Round::get_text(const std::vector<int>& points, const sf::Vector2f& text_coords, sf::Font& font)
+sf::Text Round::get_text(const std::vector<int>& points, const sf::Vector2f& text_coords, sf::Font& font, std::vector<std::string> names)
 {
     if (!font.loadFromFile("Minecraft.ttf"))
     {

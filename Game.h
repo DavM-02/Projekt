@@ -17,10 +17,13 @@ private:
 	sf::View view;
 	std::vector<PlatformObject*> platforms;
 	std::vector<int> points;
+	std::vector<std::string> names;
 	PlayerObject* player;
 	sf::Clock clock;
 	sf::Clock round_clock;
 	sf::Font text_font;
+	sf::Text playerText;
+	sf::String playerInput;
 	Menu* menu;
 	std::vector<sf::RectangleShape>imported_textures;
 	Round* round;
