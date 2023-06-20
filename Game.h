@@ -16,8 +16,7 @@ private:
 	sf::RenderWindow& window;
 	sf::View view;
 	std::vector<PlatformObject*> platforms;
-	std::vector<int> points;
-	std::vector<std::string> names;
+	std::vector<std::pair<int, std::string>> scores;
 	PlayerObject* player;
 	sf::Clock clock;
 	sf::Clock round_clock;

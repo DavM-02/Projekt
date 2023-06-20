@@ -93,18 +93,18 @@ sf::Text Round::get_text(PlayerObject* player, const sf::Vector2f& text_coords, 
     points_text->setPosition(text_coords);
     return *points_text;
 }
-sf::Text Round::get_text(const std::vector<int>& points, const sf::Vector2f& text_coords, sf::Font& font, std::vector<std::string> names)
+sf::Text Round::get_text(const sf::Vector2f& text_coords, sf::Font& font, std::vector<std::pair<int, std::string>> scores)
 {
     if (!font.loadFromFile("Minecraft.ttf"))
     {
         throw("Missing font file!");
     }
     sf::Text* highest_scores = new sf::Text(
-        "TOP 5 WYNIKOW:\n1: " + std::to_string(points[0]) +
-        "\n2: " + std::to_string(points[1]) +
-        "\n3: " + std::to_string(points[2]) +
-        "\n4: " + std::to_string(points[3]) +
-        "\n5: " + std::to_string(points[4])
+        "TOP 5 WYNIKOW:\n1: " + scores[0].second + " " + std::to_string(scores[0].first) + 
+        "\n2: " + scores[1].second + " " + std::to_string(scores[1].first) +
+        "\n3: " + scores[2].second + " " + std::to_string(scores[2].first) + 
+        "\n4: " + scores[3].second + " " + std::to_string(scores[3].first) +
+        "\n5: " + scores[4].second + " " + std::to_string(scores[4].first)
         , font, 45);
     highest_scores->setFillColor(sf::Color::Magenta);
     highest_scores->setPosition(text_coords);

@@ -23,6 +23,6 @@ public:
     void draw_round(sf::RenderWindow& _window, const sf::Vector2f& pos);
     sf::Vector2f get_coordinates(int n);
     sf::Text get_text(PlayerObject* player, const sf::Vector2f& text_coords, sf::Font& font);
-    sf::Text get_text(const std::vector<int>& points, const sf::Vector2f& text_coords, sf::Font& font, std::vector<std::string> names);
+    sf::Text get_text(const sf::Vector2f& text_coords, sf::Font& font, std::vector<std::pair<int, std::string>> scores);
 };
 

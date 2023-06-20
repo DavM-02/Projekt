@@ -32,7 +32,6 @@ std::vector<float> Game::get_y_coordinates()
 }
 void Game::gameLoop()
 {
-    sf::String playerInput;
     sf::Font f;
     f.loadFromFile("Minecraft.ttf");
     playerText.setFont(f);
@@ -50,7 +49,7 @@ void Game::gameLoop()
             {
                 playerInput += event.text.unicode;
                 playerText.setString("Podaj swoje imie: "+playerInput);
-                std::cout << playerInput.toAnsiString() << std::endl;
+
             }
             if (event.type == sf::Event::Closed)
             {
@@ -356,6 +355,8 @@ void Game::end_of_game()
     {
         std::fstream file;
         std::string points_from_file;
+        std::string name;
+        int i = 0; int j = 0;
         /*
         auto now = std::chrono::zoned_time{ std::chrono::current_zone(), floor<std::chrono::seconds>(std::chrono::system_clock::now()) }.get_local_time();
         auto ld = floor<std::chrono::days>(now);
@@ -370,25 +371,25 @@ void Game::end_of_game()
         file.open("wyniki.txt", std::ios_base::app);
         if (file.is_open())
         {
-            file << player->get_PointsNumber() << std::endl << std::flush;
+            file << playerInput.toAnsiString() << ' ' << player->get_PointsNumber() << std::endl << std::flush;
         }
         file.close();
-        file.open("wyniki.txt", std::ios::in | std::ios::out);
-        if (file.is_open())
-        {
-            while (getline(file, points_from_file))
-            {
-                points.emplace_back(std::stoi(points_from_file));
-            }
-        }
-        std::sort(points.begin(), points.end(), [](int a, int b) {return a > b; });
+       file.open("wyniki.txt", std::ios::in | std::ios::out);
+       if (file.is_open())
+       {
+         while (file >> name >> points_from_file)
+         {
+             scores.push_back(std::make_pair(std::stoi(points_from_file), name));
+         }
+       }
+        std::sort(scores.begin(), scores.end(),std::greater<std::pair<int, std::string> >());
         file.close();
         file_updated = true;
     }
 
     window.draw(*end_of_round);
     window.draw(round->get_text(player, window.mapPixelToCoords({ 10,15 }), text_font));//Rysuje liczbe sume punktow zdobyta przez gracza w aktualnej grze
-    window.draw(round->get_text(points, window.mapPixelToCoords({ 350,550 }), text_font,names));//Rysuje top 5 punktów z pliku
+    window.draw(round->get_text(window.mapPixelToCoords({ 350,550 }), text_font,scores));//Rysuje top 5 punktów z pliku
 }
 
 void Game::end_game_esc()
@@ -409,22 +410,22 @@ void Game::end_game_esc()
         {
             file << playerInput.toAnsiString() << ' ' << player->get_PointsNumber() << std::endl << std::flush;
         }
-        file.close();
-        file.open("wyniki.txt", std::ios::in | std::ios::out);
-        if (file.is_open())
-        {
-            while (file >> name >> points_from_file)
-            {
-                points.emplace_back(std::stoi(points_from_file));
-            }
-            std::sort(points.begin(), points.end(), [](int a, int b) {return a > b; });
+//        file.close();
+//        file.open("wyniki.txt", std::ios::in | std::ios::out);
+//        if (file.is_open())
+//        {
+//            while (file >> name >> points_from_file)
+//            {
+//                points.emplace_back(std::stoi(points_from_file));
+//            }
+//            std::sort(points.begin(), points.end(), [](int a, int b) {return a > b; });
 
-        }
-        file.close();
-        file_updated = true;
+//        }
+//        file.close();
+//        file_updated = true;
     }
 
-    window.draw(*end_game_esc);
-    window.draw(round->get_text(player, window.mapPixelToCoords({ 10,15 }), text_font));//Rysuje liczbe sume punktow zdobyta przez gracza w aktualnej grze
-    window.draw(round->get_text(points, window.mapPixelToCoords({ 350,550 }), text_font,names));//Rysuje top 5 punktów z pliku
+//    window.draw(*end_game_esc);
+//    window.draw(round->get_text(player, window.mapPixelToCoords({ 10,15 }), text_font));//Rysuje liczbe sume punktow zdobyta przez gracza w aktualnej grze
+//    window.draw(round->get_text(points, window.mapPixelToCoords({ 350,550 }), text_font,names));//Rysuje top 5 punktów z pliku
 }
